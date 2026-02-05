@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026年打卡日历</title>
+    <title>2026年 Free Yourself</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
@@ -318,23 +318,19 @@
         .day-number {
             font-size: 1.1em;
             margin-bottom: 4px;
+            line-height: 1.2;
         }
 
         .mood-score {
             font-size: 0.75em;
             color: #667eea;
             font-weight: 700;
+            line-height: 1;
+            padding-top: 2px;
         }
 
         .day.checked-in .mood-score {
             color: #333;
-        }
-
-        .mood-indicator {
-            position: absolute;
-            bottom: 4px;
-            right: 4px;
-            font-size: 0.9em;
         }
 
         .legend {
@@ -533,31 +529,159 @@
             margin: 8px 0;
         }
 
+        /* 手机端优化 */
         @media (max-width: 768px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
+            body {
+                padding: 10px;
             }
 
-            .days-grid {
-                gap: 4px;
+            .container {
+                padding: 0;
             }
 
-            .day {
-                font-size: 0.8em;
-                padding: 6px 2px;
-            }
-
-            .mood-score {
-                font-size: 0.65em;
+            .header h1 {
+                font-size: 1.5em;
             }
 
             .status-bar {
                 flex-direction: column;
                 align-items: flex-start;
+                padding: 15px;
             }
 
             .btn-settings {
                 width: 100%;
+                margin-top: 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-value {
+                font-size: 2em;
+            }
+
+            .countdown-box {
+                padding: 15px;
+            }
+
+            .countdown-days {
+                font-size: 2.5em;
+            }
+
+            .current-date {
+                font-size: 0.8em;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .calendar-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .month-card {
+                padding: 15px;
+                border-radius: 12px;
+            }
+
+            .month-title {
+                font-size: 1.2em;
+                margin-bottom: 12px;
+            }
+
+            .days-grid {
+                gap: 3px;
+            }
+
+            .day {
+                aspect-ratio: 1;
+                font-size: 0.75em;
+                padding: 4px 2px;
+                border-radius: 6px;
+            }
+
+            .day-number {
+                font-size: 1em;
+                margin-bottom: 2px;
+            }
+
+            .mood-score {
+                font-size: 0.65em;
+                padding-top: 1px;
+            }
+
+            .legend {
+                gap: 10px;
+                padding: 12px;
+                font-size: 0.8em;
+            }
+
+            .legend-color {
+                width: 16px;
+                height: 16px;
+                font-size: 0.65em;
+            }
+
+            .modal-content {
+                padding: 20px;
+                max-width: 95%;
+            }
+
+            .modal-header h2 {
+                font-size: 1.3em;
+            }
+
+            textarea {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            .mood-value {
+                font-size: 1.3em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+
+            .header h1 {
+                font-size: 1.3em;
+            }
+
+            .month-card {
+                padding: 12px;
+            }
+
+            .month-title {
+                font-size: 1.1em;
+                margin-bottom: 10px;
+            }
+
+            .day {
+                font-size: 0.7em;
+                padding: 3px 1px;
+            }
+
+            .day-number {
+                font-size: 0.95em;
+            }
+
+            .mood-score {
+                font-size: 0.6em;
+            }
+
+            .stat-value {
+                font-size: 1.8em;
             }
         }
     </style>
@@ -618,7 +742,8 @@
             <div class="countdown-days" id="countdown">-</div>
             <div class="countdown-label">个工作日（非周末+节假日）</div>
             <div style="margin-top: 10px;">
-                <span class="current-date">今天：<span id="currentDate"></span></span>
+                <span class="current-date">还剩 <strong id="weeksRemaining">-</strong> 周</span>
+                <span style="margin-left: 20px;">今天：<span id="currentDate"></span></span>
             </div>
         </div>
 
@@ -688,8 +813,20 @@
                 <p><strong>记录：</strong><span id="detailText"></span></p>
                 <p><strong>时间：</strong><span id="detailTime"></span></p>
                 <div class="modal-actions">
-                    <button class="btn btn-secondary" id="closeDetailBtn">关闭</button>
+                    <button class="btn btn-secondary" id="editCheckinBtn">编辑备注</button>
                     <button class="btn btn-primary" id="deleteCheckinBtn">删除打卡</button>
+                </div>
+            </div>
+
+            <!-- 编辑备注 -->
+            <div class="checkin-form" id="editNoteForm" style="display: none;">
+                <div class="form-group">
+                    <label for="editNote">修改备注</label>
+                    <textarea id="editNote" placeholder="修改今天的备注内容..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="cancelEditBtn">取消</button>
+                    <button class="btn btn-primary" id="saveEditBtn">保存修改</button>
                 </div>
             </div>
         </div>
@@ -702,8 +839,8 @@
         // 🔒 配置区域：在这里修改你的 Supabase 连接信息
         // ============================================================
         const DEFAULT_SUPABASE_CONFIG = {
-            url: 'https://bbmdviffgxarxuptfftp.supabase.co',  // 👈 在这里填入你的 Supabase URL
-            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJibWR2aWZmZ3hhcnh1cHRmZnRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MzgyNzEsImV4cCI6MjA4NTUxNDI3MX0.qqceYnTa7ZtD-Sl1JbNFs1l_0JStdTzrrIXiXv62k54'  // 👈 在这里填入你的 Supabase Anon Key
+            url: 'https://your-project.supabase.co',  // 👈 在这里填入你的 Supabase URL
+            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'  // 👈 在这里填入你的 Supabase Anon Key
         };
         // ============================================================
 
@@ -908,6 +1045,55 @@
             }
         }
 
+        // 编辑备注
+        function openEditNoteForm() {
+            const dateStr = appState.selectedDate.toISOString().split('T')[0];
+            const existingCheckin = appState.checkins.find(c => c.date === dateStr);
+
+            if (existingCheckin) {
+                document.getElementById('checkinDetail').style.display = 'none';
+                document.getElementById('editNoteForm').style.display = 'block';
+                document.getElementById('editNote').value = existingCheckin.note || '';
+                document.getElementById('modalTitle').textContent = '编辑备注';
+            }
+        }
+
+        // 保存备注修改
+        async function saveNoteEdit() {
+            if (!appState.supabase || !appState.selectedDate) return;
+
+            const note = document.getElementById('editNote').value.trim();
+            const dateStr = appState.selectedDate.toISOString().split('T')[0];
+
+            try {
+                const { error } = await appState.supabase
+                    .from('checkins')
+                    .update({ note: note, updated_at: new Date().toISOString() })
+                    .eq('date', dateStr);
+
+                if (error) throw error;
+
+                await loadCheckins();
+                closeModal();
+                showStatus('✅ 备注已更新！', 'success');
+            } catch (error) {
+                console.error('更新失败:', error);
+                alert('更新失败：' + error.message);
+            }
+        }
+
+        // 取消编辑
+        function cancelEdit() {
+            const dateStr = appState.selectedDate.toISOString().split('T')[0];
+            const existingCheckin = appState.checkins.find(c => c.date === dateStr);
+
+            if (existingCheckin) {
+                document.getElementById('editNoteForm').style.display = 'none';
+                document.getElementById('checkinDetail').style.display = 'block';
+                document.getElementById('modalTitle').textContent = '打卡详情';
+            }
+        }
+
         // 打开打卡模态框
         function openCheckinModal(date) {
             if (!appState.isConnected) {
@@ -928,6 +1114,7 @@
                 document.getElementById('modalTitle').textContent = '打卡详情';
                 document.getElementById('checkinForm').style.display = 'none';
                 document.getElementById('checkinDetail').style.display = 'block';
+                document.getElementById('editNoteForm').style.display = 'none';
                 document.getElementById('detailMood').textContent = existingCheckin.mood;
                 document.getElementById('detailText').textContent = existingCheckin.note || '无';
                 document.getElementById('detailTime').textContent = new Date(existingCheckin.created_at).toLocaleString('zh-CN');
@@ -936,6 +1123,7 @@
                 document.getElementById('modalTitle').textContent = '打卡';
                 document.getElementById('checkinForm').style.display = 'block';
                 document.getElementById('checkinDetail').style.display = 'none';
+                document.getElementById('editNoteForm').style.display = 'none';
                 document.getElementById('moodSlider').value = 50;
                 document.getElementById('note').value = '';
                 updateMoodDisplay();
@@ -963,15 +1151,6 @@
             else emoji = '😄';
 
             document.getElementById('moodEmoji').textContent = emoji;
-        }
-
-        // 获取心情emoji
-        function getMoodEmoji(value) {
-            if (value <= 20) return '😢';
-            if (value <= 40) return '😕';
-            if (value <= 60) return '😐';
-            if (value <= 80) return '😊';
-            return '😄';
         }
 
         // 判断是否是节假日
@@ -1026,12 +1205,14 @@
             return true;
         }
 
-        // 计算工作日倒计时
+        // 计算工作日倒计时和剩余周数
         function calculateWorkdays() {
             const today = new Date();
             const targetDate = new Date(2026, 5, 12); // 6月12日
 
-            if (today > targetDate) return 0;
+            if (today > targetDate) {
+                return { workdays: 0, weeks: 0 };
+            }
 
             let workdays = 0;
             let current = new Date(today);
@@ -1044,13 +1225,18 @@
                 current.setDate(current.getDate() + 1);
             }
 
-            return workdays;
+            // 计算剩余周数（保留1位小数）
+            const totalDays = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
+            const weeks = Math.round((totalDays / 7) * 10) / 10;
+
+            return { workdays, weeks };
         }
 
         // 更新倒计时
         function updateCountdown() {
-            const workdays = calculateWorkdays();
-            document.getElementById('countdown').textContent = workdays;
+            const result = calculateWorkdays();
+            document.getElementById('countdown').textContent = result.workdays;
+            document.getElementById('weeksRemaining').textContent = result.weeks;
 
             const today = new Date();
             const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
@@ -1098,7 +1284,10 @@
         // 生成单月日历
         function generateMonthCalendar(month) {
             const year = 2026;
-            const firstDay = new Date(year, month, 1).getDay();
+            // 计算当月第一天是周几（0=周日,1=周一,...,6=周六）
+            const firstDayOfWeek = new Date(year, month, 1).getDay();
+            // 转换为周一为第一天（0=周一,1=周二,...,6=周日）
+            const firstDay = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
 
@@ -1108,8 +1297,8 @@
                     <div class="days-grid">
             `;
 
-            // 星期标题
-            const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+            // 星期标题（从周一开始）
+            const weekDays = ['一', '二', '三', '四', '五', '六', '日'];
             weekDays.forEach(day => {
                 html += `<div class="day" style="font-weight: 600; color: #667eea; cursor: default;">${day}</div>`;
             });
@@ -1146,14 +1335,12 @@
                     className += ' checked-in';
                 }
 
-                const moodScore = checkin ? `<span class="mood-score">${checkin.mood}分</span>` : '';
-                const moodIndicator = checkin ? `<span class="mood-indicator">${getMoodEmoji(checkin.mood)}</span>` : '';
+                const moodScore = checkin ? `<span class="mood-score">${checkin.mood}</span>` : '';
 
                 html += `
                     <div class="${className}" data-date="${dateStr}">
                         <span class="day-number">${day}</span>
                         ${moodScore}
-                        ${moodIndicator}
                     </div>
                 `;
             }
@@ -1225,7 +1412,9 @@
             document.getElementById('cancelBtn').addEventListener('click', closeModal);
             document.getElementById('saveCheckinBtn').addEventListener('click', saveCheckin);
             document.getElementById('deleteCheckinBtn').addEventListener('click', deleteCheckin);
-            document.getElementById('closeDetailBtn').addEventListener('click', closeModal);
+            document.getElementById('editCheckinBtn').addEventListener('click', openEditNoteForm);
+            document.getElementById('saveEditBtn').addEventListener('click', saveNoteEdit);
+            document.getElementById('cancelEditBtn').addEventListener('click', cancelEdit);
             document.getElementById('moodSlider').addEventListener('input', updateMoodDisplay);
 
             // 点击模态框外部关闭
