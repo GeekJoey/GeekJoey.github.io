@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026年打卡日历</title>
+    <title>2026 Free Yourself</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
@@ -165,42 +165,88 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        .stats-section {
+        /* 被启发模块样式 */
+        .inspire-section {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-            display: none;
-        }
-
-        .stats-section.show {
-            display: block;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-        }
-
-        .stat-card {
             text-align: center;
-            padding: 20px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-radius: 12px;
         }
 
-        .stat-value {
-            font-size: 2.5em;
-            font-weight: 700;
+        .inspire-section h3 {
             color: #667eea;
-            margin-bottom: 5px;
+            margin-bottom: 15px;
+            font-size: 1.2em;
         }
 
-        .stat-label {
+        .daily-inspiration {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .daily-inspiration-label {
+            color: #667eea;
             font-size: 0.9em;
-            color: #777;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .daily-inspiration-content {
+            color: #333;
+            font-size: 1.1em;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .inspire-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-inspire {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 12px 30px;
+            font-size: 1em;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(240, 147, 251, 0.3);
+        }
+
+        .btn-inspire:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(240, 147, 251, 0.4);
+        }
+
+        .btn-refresh-inspire {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            font-size: 1em;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-refresh-inspire:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 统计信息区域样式（已停用） */
+        .stats-section {
+            display: none;
         }
 
         .countdown-box {
@@ -228,6 +274,12 @@
         .countdown-label {
             font-size: 0.9em;
             color: #777;
+        }
+
+        .countdown-extra {
+            margin-top: 10px;
+            font-size: 0.95em;
+            color: #555;
         }
 
         .current-date {
@@ -292,13 +344,13 @@
         }
 
         .day.holiday {
-            background: linear-gradient(135deg, #ffd93d 0%, #ff9a3c 100%);
-            color: white;
-            font-weight: 600;
+            /* 节假日不再高亮背景色，仅保持普通工作日样式 */
+            background: white;
+            border: 1px solid #ddd;
         }
 
         .day.workday-adjust {
-            background: #ffecb3;
+            background: white;
             border: 1px solid #ddd;
         }
 
@@ -337,6 +389,36 @@
             font-size: 0.9em;
         }
 
+        /* 节假日和调休标注 */
+        .day-tag {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 0.55em;
+            font-weight: 700;
+            padding: 1px 3px;
+            border-radius: 3px;
+            line-height: 1;
+            z-index: 10;
+            background: transparent !important;
+            text-shadow: 0 0 2px white;
+        }
+
+        .day.holiday .day-tag {
+            color: #ff4444 !important;
+            font-size: 0.5em;
+            font-weight: 700;
+            text-shadow: 0 0 3px white, 0 0 3px white, 0 0 3px white;
+        }
+
+        .day.workday-adjust .day-tag {
+            color: #d4a800 !important;
+            font-size: 0.5em;
+            font-weight: 700;
+            text-shadow: 0 0 3px white, 0 0 3px white, 0 0 3px white;
+        }
+
+        /* 图例说明 */
         .legend {
             display: flex;
             flex-wrap: wrap;
@@ -377,13 +459,17 @@
         }
 
         .legend-color.holiday {
-            background: linear-gradient(135deg, #ffd93d 0%, #ff9a3c 100%);
-            color: white;
+            background: white;
+            border: 1px solid #ddd;
+            color: #ff4444;
+            font-weight: 700;
         }
 
         .legend-color.workday-adjust {
-            background: #ffecb3;
+            background: white;
             border: 1px solid #ddd;
+            color: #ffcc00;
+            font-weight: 700;
         }
 
         .legend-color.weekend {
@@ -396,6 +482,7 @@
             border: 1px solid #ddd;
         }
 
+        /* 模态框 */
         .modal {
             display: none;
             position: fixed;
@@ -520,6 +607,7 @@
             display: flex;
             gap: 10px;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
 
         .checkin-detail {
@@ -531,8 +619,18 @@
 
         .checkin-detail p {
             margin: 8px 0;
+            word-wrap: break-word;
         }
 
+        /* 编辑备注区域 */
+        .edit-note-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        /* 响应式优化 */
         @media (max-width: 768px) {
             .stats-grid {
                 grid-template-columns: 1fr;
@@ -543,12 +641,23 @@
             }
 
             .day {
-                font-size: 0.8em;
-                padding: 6px 2px;
+                font-size: 0.75em;
+                padding: 4px 2px;
+            }
+
+            .day-number {
+                font-size: 0.95em;
+                margin-bottom: 2px;
             }
 
             .mood-score {
-                font-size: 0.65em;
+                font-size: 0.6em;
+                font-weight: 700;
+            }
+
+            .day-tag {
+                font-size: 0.5em;
+                padding: 1px 2px;
             }
 
             .status-bar {
@@ -558,6 +667,57 @@
 
             .btn-settings {
                 width: 100%;
+                margin-top: 10px;
+            }
+
+            .modal-content {
+                padding: 20px;
+                max-width: 95%;
+            }
+
+            .countdown-days {
+                font-size: 2.5em;
+            }
+
+            .month-title {
+                font-size: 1.3em;
+            }
+
+            .legend {
+                font-size: 0.8em;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .day {
+                font-size: 0.65em;
+                padding: 3px 1px;
+            }
+
+            .day-number {
+                font-size: 0.85em;
+            }
+
+            .mood-score {
+                font-size: 0.55em;
+            }
+
+            .day-tag {
+                font-size: 0.45em;
+                padding: 0.5px 1.5px;
+            }
+
+            .modal-content {
+                padding: 15px;
+            }
+
+            .modal-header h2 {
+                font-size: 1.3em;
             }
         }
     </style>
@@ -565,8 +725,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📅 2026年打卡日历</h1>
-            <p style="color: rgba(255,255,255,0.8);">记录每一天的心情与成长</p>
+            <h1>2026 Free Yourself</h1>
+            <p style="color: rgba(255,255,255,0.8);">designed by Joeyyaoyz</p>
         </div>
 
         <!-- 状态栏 -->
@@ -594,21 +754,16 @@
             </div>
         </div>
 
-        <!-- 统计信息 -->
-        <div class="stats-section" id="statsSection">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="totalCheckins">0</div>
-                    <div class="stat-label">打卡天数</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="avgMood">0</div>
-                    <div class="stat-label">平均心情</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="streak">0</div>
-                    <div class="stat-label">连续打卡天数</div>
-                </div>
+        <!-- 被启发模块 -->
+        <div class="inspire-section" id="inspireSection">
+            <h3>✨ 灵感记录</h3>
+            <div class="daily-inspiration" id="dailyInspiration">
+                <div class="daily-inspiration-label">今日灵感</div>
+                <div class="daily-inspiration-content" id="dailyInspirationContent">正在加载今日灵感...</div>
+            </div>
+            <div class="inspire-actions">
+                <button class="btn-inspire" id="inspireBtn">💡 记录灵感</button>
+                <button class="btn-refresh-inspire" id="refreshInspireBtn">🔄 换一条</button>
             </div>
         </div>
 
@@ -617,6 +772,7 @@
             <div class="countdown-title">距离 6月12日 还有</div>
             <div class="countdown-days" id="countdown">-</div>
             <div class="countdown-label">个工作日（非周末+节假日）</div>
+            <div class="countdown-extra" id="countdownExtra">剩余周数：-</div>
             <div style="margin-top: 10px;">
                 <span class="current-date">今天：<span id="currentDate"></span></span>
             </div>
@@ -633,11 +789,11 @@
                 <span>已打卡</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color holiday">🎉</div>
+                <div class="legend-color holiday">节</div>
                 <span>节假日</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color workday-adjust">📅</div>
+                <div class="legend-color workday-adjust">班</div>
                 <span>调休工作日</span>
             </div>
             <div class="legend-item">
@@ -652,6 +808,24 @@
 
         <!-- 日历 -->
         <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+
+    <!-- 被启发模态框 -->
+    <div class="modal" id="inspireModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="inspireModalTitle">记录灵感</h2>
+                <button class="close-btn" id="closeInspireModalBtn">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="inspireContent" style="display: block; margin-bottom: 10px; font-weight: 600;">启发内容</label>
+                <textarea id="inspireContent" placeholder="今天你被什么启发了？记录下你的灵感和想法..." style="min-height: 120px;"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancelInspireBtn">取消</button>
+                <button class="btn btn-primary" id="saveInspireBtn">保存灵感</button>
+            </div>
+        </div>
     </div>
 
     <!-- 打卡模态框 -->
@@ -688,8 +862,21 @@
                 <p><strong>记录：</strong><span id="detailText"></span></p>
                 <p><strong>时间：</strong><span id="detailTime"></span></p>
                 <div class="modal-actions">
+                    <button class="btn btn-secondary" id="editNoteBtn">编辑备注</button>
                     <button class="btn btn-secondary" id="closeDetailBtn">关闭</button>
                     <button class="btn btn-primary" id="deleteCheckinBtn">删除打卡</button>
+                </div>
+            </div>
+
+            <!-- 编辑备注 -->
+            <div class="edit-note-section" id="editNoteSection" style="display: none;">
+                <div class="form-group">
+                    <label for="editNoteInput">编辑备注</label>
+                    <textarea id="editNoteInput" placeholder="修改记录内容..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="cancelEditBtn">取消</button>
+                    <button class="btn btn-primary" id="saveEditBtn">保存修改</button>
                 </div>
             </div>
         </div>
@@ -707,29 +894,33 @@
         };
         // ============================================================
 
-        // 2026年法定节假日配置
+        // 2026年法定节假日配置（根据国务院最新通知）
         const holidays2026 = {
             '春节': {
-                start: { month: 1, day: 15 },
-                end: { month: 1, day: 23 },
-                workDaysBefore: [{ month: 1, day: 14 }],
-                workDaysAfter: [{ month: 1, day: 28 }]
+                name: '春节',
+                start: { month: 1, day: 15 },  // 2月15日
+                end: { month: 1, day: 23 },    // 2月23日
+                workDaysBefore: [{ month: 1, day: 14 }],  // 2月14日（周六）上班
+                workDaysAfter: [{ month: 1, day: 28 }]   // 2月28日（周六）上班
             },
             '清明节': {
-                start: { month: 3, day: 4 },
-                end: { month: 3, day: 6 },
+                name: '清明',
+                start: { month: 3, day: 4 },  // 4月4日
+                end: { month: 3, day: 6 },    // 4月6日
                 workDaysBefore: [],
                 workDaysAfter: []
             },
             '劳动节': {
-                start: { month: 4, day: 1 },
-                end: { month: 4, day: 5 },
+                name: '五一',
+                start: { month: 4, day: 1 },  // 5月1日
+                end: { month: 4, day: 5 },    // 5月5日
                 workDaysBefore: [],
-                workDaysAfter: [{ month: 4, day: 9 }]
+                workDaysAfter: [{ month: 4, day: 9 }]   // 5月9日（周六）上班
             },
             '端午节': {
-                start: { month: 5, day: 19 },
-                end: { month: 5, day: 21 },
+                name: '端午',
+                start: { month: 5, day: 19 },  // 6月19日
+                end: { month: 5, day: 21 },    // 6月21日
                 workDaysBefore: [],
                 workDaysAfter: []
             }
@@ -739,6 +930,7 @@
         const appState = {
             supabase: null,
             checkins: [],
+            inspires: [],
             selectedDate: null,
             isConnected: false
         };
@@ -800,9 +992,9 @@
                 // 加载打卡数据
                 await loadCheckins();
 
-                // 显示统计信息
-                const statsSection = document.getElementById('statsSection');
-                statsSection.classList.add('show');
+                // 加载灵感数据并显示今日灵感
+                await loadInspires();
+                displayDailyInspiration();
 
             } catch (error) {
                 appState.isConnected = false;
@@ -845,10 +1037,76 @@
 
                 appState.checkins = data || [];
                 renderCalendar();
-                updateStats();
             } catch (error) {
                 console.error('加载数据失败:', error);
             }
+        }
+
+        // 加载灵感数据
+        async function loadInspires() {
+            if (!appState.supabase) return;
+
+            try {
+                const { data, error } = await appState.supabase
+                    .from('inspires')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    // 表不存在时静默处理
+                    console.log('灵感表不存在或加载失败');
+                    return;
+                }
+
+                appState.inspires = data || [];
+            } catch (error) {
+                console.error('加载灵感数据失败:', error);
+            }
+        }
+
+        // 显示今日灵感
+        function displayDailyInspiration() {
+            const contentElement = document.getElementById('dailyInspirationContent');
+            
+            if (!appState.inspires || appState.inspires.length === 0) {
+                contentElement.textContent = '暂无灵感记录，快来记录第一条灵感吧！';
+                return;
+            }
+
+            // 使用日期作为随机种子，确保同一天显示相同的灵感
+            const today = new Date();
+            const dateStr = today.toISOString().split('T')[0];
+            
+            // 计算今日的随机索引
+            let seed = 0;
+            for (let i = 0; i < dateStr.length; i++) {
+                seed += dateStr.charCodeAt(i);
+            }
+            
+            const randomIndex = seed % appState.inspires.length;
+            const todayInspiration = appState.inspires[randomIndex];
+            
+            contentElement.textContent = todayInspiration.content;
+        }
+
+        // 刷新今日灵感
+        function refreshDailyInspiration() {
+            if (!appState.inspires || appState.inspires.length <= 1) {
+                showStatus('灵感记录不足，无法更换', 'error');
+                return;
+            }
+
+            const contentElement = document.getElementById('dailyInspirationContent');
+            const currentContent = contentElement.textContent;
+            
+            // 随机选择一个与当前不同的灵感
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * appState.inspires.length);
+            } while (appState.inspires[newIndex].content === currentContent);
+            
+            contentElement.textContent = appState.inspires[newIndex].content;
+            showStatus('已更换今日灵感', 'success');
         }
 
         // 保存打卡
@@ -908,6 +1166,82 @@
             }
         }
 
+        // 保存编辑后的备注
+        async function saveEditNote() {
+            if (!appState.supabase || !appState.selectedDate) return;
+
+            const note = document.getElementById('editNoteInput').value.trim();
+            const dateStr = appState.selectedDate.toISOString().split('T')[0];
+
+            try {
+                const { error } = await appState.supabase
+                    .from('checkins')
+                    .update({ note: note })
+                    .eq('date', dateStr);
+
+                if (error) throw error;
+
+                await loadCheckins();
+                closeEditSection();
+                showStatus('✅ 备注已更新', 'success');
+            } catch (error) {
+                console.error('更新失败:', error);
+                alert('更新失败：' + error.message);
+            }
+        }
+
+        // 打开灵感模态框
+        function openInspireModal() {
+            if (!appState.isConnected) {
+                alert('请先连接 Supabase 才能记录灵感！');
+                const configSection = document.getElementById('configSection');
+                configSection.classList.add('show');
+                return;
+            }
+
+            document.getElementById('inspireContent').value = '';
+            document.getElementById('inspireModal').classList.add('show');
+        }
+
+        // 关闭灵感模态框
+        function closeInspireModal() {
+            document.getElementById('inspireModal').classList.remove('show');
+        }
+
+        // 保存灵感
+        async function saveInspire() {
+            if (!appState.supabase) {
+                alert('请先连接Supabase');
+                return;
+            }
+
+            const content = document.getElementById('inspireContent').value.trim();
+            
+            if (!content) {
+                alert('请输入启发内容');
+                return;
+            }
+
+            try {
+                const { error } = await appState.supabase
+                    .from('inspires')
+                    .insert({
+                        content: content,
+                        created_at: new Date().toISOString()
+                    });
+
+                if (error) throw error;
+
+                await loadInspires();
+                displayDailyInspiration(); // 保存后更新今日灵感显示
+                closeInspireModal();
+                showStatus('✅ 灵感已保存！', 'success');
+            } catch (error) {
+                console.error('保存失败:', error);
+                alert('保存失败：' + error.message);
+            }
+        }
+
         // 打开打卡模态框
         function openCheckinModal(date) {
             if (!appState.isConnected) {
@@ -928,6 +1262,7 @@
                 document.getElementById('modalTitle').textContent = '打卡详情';
                 document.getElementById('checkinForm').style.display = 'none';
                 document.getElementById('checkinDetail').style.display = 'block';
+                document.getElementById('editNoteSection').style.display = 'none';
                 document.getElementById('detailMood').textContent = existingCheckin.mood;
                 document.getElementById('detailText').textContent = existingCheckin.note || '无';
                 document.getElementById('detailTime').textContent = new Date(existingCheckin.created_at).toLocaleString('zh-CN');
@@ -936,6 +1271,7 @@
                 document.getElementById('modalTitle').textContent = '打卡';
                 document.getElementById('checkinForm').style.display = 'block';
                 document.getElementById('checkinDetail').style.display = 'none';
+                document.getElementById('editNoteSection').style.display = 'none';
                 document.getElementById('moodSlider').value = 50;
                 document.getElementById('note').value = '';
                 updateMoodDisplay();
@@ -948,6 +1284,22 @@
         function closeModal() {
             document.getElementById('checkinModal').classList.remove('show');
             appState.selectedDate = null;
+        }
+
+        // 打开编辑备注区域
+        function openEditSection() {
+            const existingCheckin = appState.checkins.find(c => c.date === appState.selectedDate.toISOString().split('T')[0]);
+            if (existingCheckin) {
+                document.getElementById('editNoteInput').value = existingCheckin.note || '';
+                document.getElementById('checkinDetail').style.display = 'none';
+                document.getElementById('editNoteSection').style.display = 'block';
+            }
+        }
+
+        // 关闭编辑备注区域
+        function closeEditSection() {
+            document.getElementById('editNoteSection').style.display = 'none';
+            document.getElementById('checkinDetail').style.display = 'block';
         }
 
         // 更新心情显示
@@ -965,26 +1317,22 @@
             document.getElementById('moodEmoji').textContent = emoji;
         }
 
-        // 获取心情emoji
-        function getMoodEmoji(value) {
-            if (value <= 20) return '😢';
-            if (value <= 40) return '😕';
-            if (value <= 60) return '😐';
-            if (value <= 80) return '😊';
-            return '😄';
-        }
-
-        // 判断是否是节假日
-        function isHoliday(month, day) {
-            for (const holiday of Object.values(holidays2026)) {
+        // 获取节假日名称
+        function getHolidayName(month, day) {
+            for (const [name, holiday] of Object.entries(holidays2026)) {
                 const start = new Date(2026, holiday.start.month, holiday.start.day);
                 const end = new Date(2026, holiday.end.month, holiday.end.day);
                 const current = new Date(2026, month, day);
                 if (current >= start && current <= end) {
-                    return true;
+                    return holiday.name;
                 }
             }
-            return false;
+            return null;
+        }
+
+        // 判断是否是节假日
+        function isHoliday(month, day) {
+            return getHolidayName(month, day) !== null;
         }
 
         // 判断是否是调休工作日
@@ -1031,7 +1379,7 @@
             const today = new Date();
             const targetDate = new Date(2026, 5, 12); // 6月12日
 
-            if (today > targetDate) return 0;
+            if (today > targetDate) return { workdays: 0, weeks: 0 };
 
             let workdays = 0;
             let current = new Date(today);
@@ -1044,13 +1392,18 @@
                 current.setDate(current.getDate() + 1);
             }
 
-            return workdays;
+            // 计算剩余周数（完整周）
+            const daysDiff = Math.floor((targetDate - today) / (1000 * 60 * 60 * 24));
+            const weeks = Math.ceil(daysDiff / 7);
+
+            return { workdays, weeks };
         }
 
         // 更新倒计时
         function updateCountdown() {
-            const workdays = calculateWorkdays();
+            const { workdays, weeks } = calculateWorkdays();
             document.getElementById('countdown').textContent = workdays;
+            document.getElementById('countdownExtra').textContent = `剩余周数：${weeks}周`;
 
             const today = new Date();
             const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
@@ -1098,7 +1451,12 @@
         // 生成单月日历
         function generateMonthCalendar(month) {
             const year = 2026;
-            const firstDay = new Date(year, month, 1).getDay();
+            // 计算该月第一天是周几（以周一为第一周的开始）
+            const firstDay = new Date(year, month, 1);
+            let firstDayOfWeek = firstDay.getDay(); // 0=周日, 1=周一, ..., 6=周六
+            // 转换为：周一=0, 周二=1, ..., 周日=6
+            firstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
 
@@ -1108,14 +1466,14 @@
                     <div class="days-grid">
             `;
 
-            // 星期标题
-            const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+            // 星期标题（从周一开始）
+            const weekDays = ['一', '二', '三', '四', '五', '六', '日'];
             weekDays.forEach(day => {
                 html += `<div class="day" style="font-weight: 600; color: #667eea; cursor: default;">${day}</div>`;
             });
 
             // 空白日期
-            for (let i = 0; i < firstDay; i++) {
+            for (let i = 0; i < firstDayOfWeek; i++) {
                 html += `<div class="day other-month"></div>`;
             }
 
@@ -1129,15 +1487,18 @@
 
                 let className = 'day';
 
-                // 判断日期类型
+                // 判断日期类型（确保调休和节假日样式优先级正确）
+                const holidayName = getHolidayName(month, dayOfMonth);
+                const isWorkdayAdjust = isWorkdayAdjustment(month, dayOfMonth);
+
                 if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === day) {
                     className += ' today';
+                } else if (holidayName) {
+                    className += ' holiday';
+                } else if (isWorkdayAdjust) {
+                    className += ' workday-adjust';
                 } else if (dayOfWeek === 0 || dayOfWeek === 6) {
                     className += ' weekend';
-                } else if (isHoliday(month, dayOfMonth)) {
-                    className += ' holiday';
-                } else if (isWorkdayAdjustment(month, dayOfMonth)) {
-                    className += ' workday-adjust';
                 }
 
                 // 检查是否有打卡
@@ -1146,14 +1507,22 @@
                     className += ' checked-in';
                 }
 
-                const moodScore = checkin ? `<span class="mood-score">${checkin.mood}分</span>` : '';
-                const moodIndicator = checkin ? `<span class="mood-indicator">${getMoodEmoji(checkin.mood)}</span>` : '';
+                // 获取节假日名称或调休标记
+                let dayTag = '';
+                if (holidayName) {
+                    dayTag = `<span class="day-tag">${holidayName}</span>`;
+                } else if (isWorkdayAdjustment(month, dayOfMonth)) {
+                    dayTag = `<span class="day-tag">班</span>`;
+                }
+
+                // 仅显示分数值，不显示"分"字，不显示emoji
+                const moodScore = checkin ? `<span class="mood-score">${checkin.mood}</span>` : '';
 
                 html += `
                     <div class="${className}" data-date="${dateStr}">
+                        ${dayTag}
                         <span class="day-number">${day}</span>
                         ${moodScore}
-                        ${moodIndicator}
                     </div>
                 `;
             }
@@ -1226,12 +1595,29 @@
             document.getElementById('saveCheckinBtn').addEventListener('click', saveCheckin);
             document.getElementById('deleteCheckinBtn').addEventListener('click', deleteCheckin);
             document.getElementById('closeDetailBtn').addEventListener('click', closeModal);
+            document.getElementById('editNoteBtn').addEventListener('click', openEditSection);
+            document.getElementById('cancelEditBtn').addEventListener('click', closeEditSection);
+            document.getElementById('saveEditBtn').addEventListener('click', saveEditNote);
             document.getElementById('moodSlider').addEventListener('input', updateMoodDisplay);
+            
+            // 绑定被启发功能事件
+            document.getElementById('inspireBtn').addEventListener('click', openInspireModal);
+            document.getElementById('closeInspireModalBtn').addEventListener('click', closeInspireModal);
+            document.getElementById('cancelInspireBtn').addEventListener('click', closeInspireModal);
+            document.getElementById('saveInspireBtn').addEventListener('click', saveInspire);
+            document.getElementById('refreshInspireBtn').addEventListener('click', refreshDailyInspiration);
 
             // 点击模态框外部关闭
             document.getElementById('checkinModal').addEventListener('click', function(e) {
                 if (e.target === this) {
                     closeModal();
+                }
+            });
+
+            // 点击被启发模态框外部关闭
+            document.getElementById('inspireModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeInspireModal();
                 }
             });
 
