@@ -22,6 +22,7 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            position: relative;
         }
 
         .header {
@@ -155,45 +156,133 @@
             background: #e0e0e0;
         }
 
-        .btn-settings {
-            background: rgba(255, 255, 255, 0.2);
+        .btn-save-config {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
             color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-save-config:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 54, 93, 0.4);
+        }
+
+        .btn-settings {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            padding: 0;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(26, 54, 93, 0.4);
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
         .btn-settings:hover {
-            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+            box-shadow: 0 6px 16px rgba(26, 54, 93, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .btn-settings {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1em;
+                top: 15px;
+                right: 15px;
+            }
         }
 
         /* 被启发模块样式 */
         .inspire-section {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 24px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-            text-align: center;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .inspire-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            transform: rotate(30deg);
+            pointer-events: none;
+        }
+
+        .inspire-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
         .inspire-section h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.2em;
+            color: white;
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .btn-add-inspire {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            width: 38px;
+            height: 38px;
+            font-size: 24px;
+            line-height: 38px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-add-inspire:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
         }
 
         .daily-inspiration {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 12px;
-            padding: 20px;
+            padding: 24px;
             margin-bottom: 20px;
             text-align: left;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
         .daily-inspiration-label {
             color: #667eea;
-            font-size: 0.9em;
+            font-size: 0.85em;
             font-weight: 600;
-            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
         }
 
         .daily-inspiration-content {
@@ -203,45 +292,192 @@
             font-style: italic;
         }
 
+        .inspire-content-text {
+            margin-bottom: 10px;
+            color: #444;
+            line-height: 1.7;
+        }
+
+        .btn-edit-inspire {
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+            padding: 6px 16px;
+            font-size: 0.85em;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+        }
+
+        .btn-edit-inspire:hover {
+            background: rgba(102, 126, 234, 0.25);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
         .inspire-actions {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
         .btn-inspire {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 12px 30px;
-            font-size: 1em;
-            border: none;
+            padding: 12px 28px;
+            font-size: 0.95em;
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(240, 147, 251, 0.3);
+            backdrop-filter: blur(10px);
         }
 
         .btn-inspire:hover {
+            background: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(240, 147, 251, 0.4);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
         }
 
         .btn-refresh-inspire {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 12px 30px;
-            font-size: 1em;
-            border: none;
+            padding: 12px 28px;
+            font-size: 0.95em;
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            backdrop-filter: blur(10px);
         }
 
         .btn-refresh-inspire:hover {
+            background: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .milestone-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .milestone-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            transform: rotate(30deg);
+            pointer-events: none;
+        }
+
+        .milestone-section h3 {
+            color: white;
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .milestone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-add-milestone {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            width: 38px;
+            height: 38px;
+            font-size: 24px;
+            line-height: 38px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-add-milestone:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        }
+
+        .milestone-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 40px;
+        }
+
+        .empty-milestone {
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+            font-size: 0.95em;
+            width: 100%;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .milestone-tag {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .milestone-tag:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        }
+
+        .milestone-tag .milestone-date {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+
+        .milestone-tag .delete-milestone {
+            color: #ff6b6b;
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+            margin-left: 4px;
+        }
+
+        .milestone-tag .delete-milestone:hover {
+            opacity: 1;
         }
 
         /* 统计信息区域样式（已停用） */
@@ -339,14 +575,13 @@
         }
 
         .day.weekend {
-            background: #fff5f5;
-            border: 1px solid #ddd;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border: 1px solid #fcb69f;
         }
 
         .day.holiday {
-            /* 节假日不再高亮背景色，仅保持普通工作日样式 */
-            background: white;
-            border: 1px solid #ddd;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border: 1px solid #fcb69f;
         }
 
         .day.workday-adjust {
@@ -431,6 +666,69 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
+        /* 日历切换控件 */
+        .calendar-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #667eea;
+            text-align: center;
+            flex: 1;
+        }
+
+        .calendar-nav-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .calendar-nav-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .calendar-nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 日历容器 */
+        .calendar-container {
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            touch-action: pan-y;
+        }
+
+        .calendar-slide {
+            transition: transform 0.3s ease-out;
+            will-change: transform;
+        }
+
         .legend-item {
             display: flex;
             align-items: center;
@@ -459,8 +757,8 @@
         }
 
         .legend-color.holiday {
-            background: white;
-            border: 1px solid #ddd;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border: 1px solid #fcb69f;
             color: #ff4444;
             font-weight: 700;
         }
@@ -473,8 +771,8 @@
         }
 
         .legend-color.weekend {
-            background: #fff5f5;
-            border: 1px solid #ddd;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border: 1px solid #fcb69f;
         }
 
         .legend-color.normal {
@@ -617,6 +915,23 @@
             border-radius: 8px;
         }
 
+        .milestone-detail-content {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .detail-row {
+            margin-bottom: 15px;
+        }
+
+        .detail-row strong {
+            display: inline-block;
+            min-width: 80px;
+            color: #555;
+        }
+
         .checkin-detail p {
             margin: 8px 0;
             word-wrap: break-word;
@@ -666,8 +981,11 @@
             }
 
             .btn-settings {
-                width: 100%;
-                margin-top: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.1em;
+                top: 15px;
+                right: 15px;
             }
 
             .modal-content {
@@ -724,6 +1042,7 @@
 </head>
 <body>
     <div class="container">
+        <button class="btn btn-settings" id="settingsBtn" title="Supabase设置">⚙️</button>
         <div class="header">
             <h1>2026 Free Yourself</h1>
             <p style="color: rgba(255,255,255,0.8);">designed by Joeyyaoyz</p>
@@ -734,7 +1053,6 @@
             <div class="status-message" id="statusMessage">
                 <span class="loading">⏳ 正在连接 Supabase...</span>
             </div>
-            <button class="btn btn-settings" id="settingsBtn">⚙️ 设置 Supabase</button>
         </div>
 
         <!-- Supabase 配置面板（默认隐藏） -->
@@ -749,21 +1067,34 @@
                 <input type="password" id="supabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
             </div>
             <div>
-                <button class="btn btn-primary" id="saveConfigBtn">保存并重新连接</button>
+                <button class="btn btn-save-config" id="saveConfigBtn">保存并重新连接</button>
                 <button class="btn btn-secondary" id="cancelConfigBtn">取消</button>
             </div>
         </div>
 
         <!-- 被启发模块 -->
         <div class="inspire-section" id="inspireSection">
-            <h3>✨ 灵感记录</h3>
+            <div class="inspire-header">
+                <h3>✨ 灵感记录</h3>
+                <button class="btn-add-inspire" id="inspireBtn" title="记录灵感">+</button>
+            </div>
             <div class="daily-inspiration" id="dailyInspiration">
                 <div class="daily-inspiration-label">今日灵感</div>
                 <div class="daily-inspiration-content" id="dailyInspirationContent">正在加载今日灵感...</div>
             </div>
             <div class="inspire-actions">
-                <button class="btn-inspire" id="inspireBtn">💡 记录灵感</button>
                 <button class="btn-refresh-inspire" id="refreshInspireBtn">🔄 换一条</button>
+            </div>
+        </div>
+
+        <!-- 里程碑 -->
+        <div class="milestone-section" id="milestoneSection">
+            <div class="milestone-header">
+                <h3>🎯 里程碑</h3>
+                <button class="btn-add-milestone" id="addMilestoneBtn" title="新增里程碑">+</button>
+            </div>
+            <div class="milestone-list" id="milestoneList">
+                <div class="empty-milestone">暂无里程碑记录</div>
             </div>
         </div>
 
@@ -806,11 +1137,76 @@
             </div>
         </div>
 
+        <!-- 日历切换控件 -->
+        <div class="calendar-controls">
+            <button class="calendar-nav-btn" id="prevMonthBtn" title="上个月">❮</button>
+            <div class="calendar-title" id="calendarTitle">2026年2月</div>
+            <button class="calendar-nav-btn" id="nextMonthBtn" title="下个月">❯</button>
+        </div>
+
         <!-- 日历 -->
-        <div class="calendar-grid" id="calendarGrid"></div>
+        <div class="calendar-container" id="calendarContainer">
+            <div class="calendar-slide" id="calendarSlide">
+                <div class="month-card" id="currentMonthCard">
+                    <div class="month-title" id="monthTitle">二月</div>
+                    <div class="days-grid" id="daysGrid"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- 被启发模态框 -->
+    <!-- 里程碑模态框 -->
+    <div class="modal" id="milestoneModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="milestoneModalTitle">新增里程碑</h2>
+                <button class="close-btn" id="closeMilestoneModalBtn">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="milestoneTitle" style="display: block; margin-bottom: 10px; font-weight: 600;">里程碑事件</label>
+                <input type="text" id="milestoneTitle" placeholder="例如：项目上线、生日、纪念日等" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+            </div>
+            <div class="form-group">
+                <label for="milestoneDate" style="display: block; margin-bottom: 10px; font-weight: 600;">日期</label>
+                <input type="date" id="milestoneDate" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+            </div>
+            <div class="form-group">
+                <label for="milestoneDesc" style="display: block; margin-bottom: 10px; font-weight: 600;">描述</label>
+                <textarea id="milestoneDesc" placeholder="描述这个里程碑的意义、背景或备注信息..." style="min-height: 100px;"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancelMilestoneBtn">取消</button>
+                <button class="btn btn-primary" id="saveMilestoneBtn">保存里程碑</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 里程碑详情模态框 -->
+    <div class="modal" id="milestoneDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="milestoneDetailTitle">里程碑详情</h2>
+                <button class="close-btn" id="closeMilestoneDetailBtn">&times;</button>
+            </div>
+            <div class="milestone-detail-content">
+                <div class="detail-row">
+                    <strong>日期：</strong>
+                    <span id="milestoneDetailDate"></span>
+                </div>
+                <div class="detail-row">
+                    <strong>描述：</strong>
+                    <div id="milestoneDetailDesc" style="margin-top: 10px; line-height: 1.6;"></div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" id="editMilestoneBtn">编辑</button>
+                <button class="btn btn-secondary" id="deleteMilestoneBtn">删除</button>
+                <button class="btn btn-secondary" id="closeMilestoneDetailBtn2">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 灵感记录模态框（编辑模式） -->
     <div class="modal" id="inspireModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -931,8 +1327,15 @@
             supabase: null,
             checkins: [],
             inspires: [],
+            milestones: [],
             selectedDate: null,
-            isConnected: false
+            isConnected: false,
+            currentEditingInspire: null,
+            currentEditingMilestone: null,
+            currentYear: 2026,
+            currentMonth: 1, // 默认显示2月（索引1）
+            touchStartX: 0,
+            touchEndX: 0
         };
 
         // 获取有效的 Supabase 配置（优先使用 localStorage，否则使用默认值）
@@ -995,6 +1398,9 @@
                 // 加载灵感数据并显示今日灵感
                 await loadInspires();
                 displayDailyInspiration();
+
+                // 加载里程碑数据
+                await loadMilestones();
 
             } catch (error) {
                 appState.isConnected = false;
@@ -1067,26 +1473,36 @@
         // 显示今日灵感
         function displayDailyInspiration() {
             const contentElement = document.getElementById('dailyInspirationContent');
-            
+
             if (!appState.inspires || appState.inspires.length === 0) {
-                contentElement.textContent = '暂无灵感记录，快来记录第一条灵感吧！';
+                contentElement.innerHTML = '暂无灵感记录，快来记录第一条灵感吧！';
                 return;
             }
 
             // 使用日期作为随机种子，确保同一天显示相同的灵感
             const today = new Date();
             const dateStr = today.toISOString().split('T')[0];
-            
+
             // 计算今日的随机索引
             let seed = 0;
             for (let i = 0; i < dateStr.length; i++) {
                 seed += dateStr.charCodeAt(i);
             }
-            
+
             const randomIndex = seed % appState.inspires.length;
             const todayInspiration = appState.inspires[randomIndex];
-            
-            contentElement.textContent = todayInspiration.content;
+
+            // 显示灵感内容和编辑按钮
+            contentElement.innerHTML = `
+                <div class="inspire-content-text">${todayInspiration.content}</div>
+                <button class="btn-edit-inspire" data-id="${todayInspiration.id}" title="编辑此灵感">✏️ 编辑</button>
+            `;
+
+            // 绑定编辑按钮事件
+            const editBtn = contentElement.querySelector('.btn-edit-inspire');
+            editBtn.addEventListener('click', () => {
+                openEditInspireModal(todayInspiration);
+            });
         }
 
         // 刷新今日灵感
@@ -1097,16 +1513,223 @@
             }
 
             const contentElement = document.getElementById('dailyInspirationContent');
-            const currentContent = contentElement.textContent;
-            
+            const currentContentText = contentElement.querySelector('.inspire-content-text')?.textContent || contentElement.textContent;
+
             // 随机选择一个与当前不同的灵感
             let newIndex;
             do {
                 newIndex = Math.floor(Math.random() * appState.inspires.length);
-            } while (appState.inspires[newIndex].content === currentContent);
-            
-            contentElement.textContent = appState.inspires[newIndex].content;
+            } while (appState.inspires[newIndex].content === currentContentText);
+
+            // 重新显示灵感内容和编辑按钮
+            const newInspire = appState.inspires[newIndex];
+            contentElement.innerHTML = `
+                <div class="inspire-content-text">${newInspire.content}</div>
+                <button class="btn-edit-inspire" data-id="${newInspire.id}" title="编辑此灵感">✏️ 编辑</button>
+            `;
+
+            // 绑定编辑按钮事件
+            const editBtn = contentElement.querySelector('.btn-edit-inspire');
+            editBtn.addEventListener('click', () => {
+                openEditInspireModal(newInspire);
+            });
+
             showStatus('已更换今日灵感', 'success');
+        }
+
+        // 里程碑相关功能
+        async function loadMilestones() {
+            if (!appState.supabase) return;
+
+            try {
+                const { data, error } = await appState.supabase
+                    .from('milestones')
+                    .select('*')
+                    .order('date', { ascending: false });
+
+                if (error) {
+                    console.log('里程碑表不存在或加载失败');
+                    return;
+                }
+
+                appState.milestones = data || [];
+                displayMilestones();
+            } catch (error) {
+                console.error('加载里程碑数据失败:', error);
+            }
+        }
+
+        function displayMilestones() {
+            const milestoneList = document.getElementById('milestoneList');
+
+            if (!appState.milestones || appState.milestones.length === 0) {
+                milestoneList.innerHTML = '<div class="empty-milestone">暂无里程碑记录</div>';
+                return;
+            }
+
+            milestoneList.innerHTML = appState.milestones.map(milestone => {
+                const dateStr = formatDate(milestone.date);
+                return `
+                    <div class="milestone-tag" data-id="${milestone.id}">
+                        <span class="milestone-date">${dateStr}</span>
+                        <span class="milestone-title">${milestone.title}</span>
+                        <span class="delete-milestone" data-id="${milestone.id}">×</span>
+                    </div>
+                `;
+            }).join('');
+
+            // 绑定点击事件
+            document.querySelectorAll('.milestone-tag').forEach(tag => {
+                tag.addEventListener('click', function(e) {
+                    const id = this.dataset.id;
+                    const milestone = appState.milestones.find(m => m.id == id);
+                    if (milestone && !e.target.classList.contains('delete-milestone')) {
+                        showMilestoneDetail(milestone);
+                    }
+                });
+            });
+
+            // 绑定删除按钮事件
+            document.querySelectorAll('.delete-milestone').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const id = this.dataset.id;
+                    if (confirm('确定要删除这个里程碑吗？')) {
+                        deleteMilestone(id);
+                    }
+                });
+            });
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            return `${year}年${month}月${day}日`;
+        }
+
+        function openMilestoneModal() {
+            document.getElementById('milestoneModal').classList.add('show');
+            document.getElementById('milestoneModalTitle').textContent = '新增里程碑';
+            document.getElementById('milestoneTitle').value = '';
+            document.getElementById('milestoneDate').value = '';
+            document.getElementById('milestoneDesc').value = '';
+            appState.currentEditingMilestone = null;
+        }
+
+        function closeMilestoneModal() {
+            document.getElementById('milestoneModal').classList.remove('show');
+            appState.currentEditingMilestone = null;
+        }
+
+        async function saveMilestone() {
+            if (!appState.supabase) {
+                alert('请先连接Supabase');
+                return;
+            }
+
+            const title = document.getElementById('milestoneTitle').value.trim();
+            const date = document.getElementById('milestoneDate').value;
+            const desc = document.getElementById('milestoneDesc').value.trim();
+
+            if (!title || !date) {
+                alert('请填写里程碑事件和日期');
+                return;
+            }
+
+            try {
+                if (appState.currentEditingMilestone) {
+                    // 编辑模式
+                    const { error } = await appState.supabase
+                        .from('milestones')
+                        .update({ 
+                            title, 
+                            date, 
+                            description: desc,
+                            desc: desc 
+                        })
+                        .eq('id', appState.currentEditingMilestone.id);
+
+                    if (error) throw error;
+
+                    showStatus('里程碑已更新', 'success');
+                } else {
+                    // 新增模式
+                    const { error } = await appState.supabase
+                        .from('milestones')
+                        .insert([{ 
+                            title, 
+                            date, 
+                            description: desc,
+                            desc: desc 
+                        }]);
+
+                    if (error) throw error;
+
+                    showStatus('里程碑已保存', 'success');
+                }
+
+                closeMilestoneModal();
+                await loadMilestones();
+            } catch (error) {
+                showStatus('保存失败：' + error.message, 'error');
+                console.error('保存里程碑失败:', error);
+            }
+        }
+
+        async function deleteMilestone(id) {
+            if (!appState.supabase) return;
+
+            try {
+                const { error } = await appState.supabase
+                    .from('milestones')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                showStatus('里程碑已删除', 'success');
+                await loadMilestones();
+            } catch (error) {
+                showStatus('删除失败：' + error.message, 'error');
+                console.error('删除里程碑失败:', error);
+            }
+        }
+
+        function showMilestoneDetail(milestone) {
+            document.getElementById('milestoneDetailModal').classList.add('show');
+            document.getElementById('milestoneDetailTitle').textContent = milestone.title;
+            document.getElementById('milestoneDetailDate').textContent = formatDate(milestone.date);
+            document.getElementById('milestoneDetailDesc').textContent = milestone.description || milestone.desc || '暂无描述';
+            appState.currentEditingMilestone = milestone;
+        }
+
+        function closeMilestoneDetail() {
+            document.getElementById('milestoneDetailModal').classList.remove('show');
+            appState.currentEditingMilestone = null;
+        }
+
+        function editMilestone() {
+            if (!appState.currentEditingMilestone) return;
+
+            const milestone = appState.currentEditingMilestone;
+            closeMilestoneDetail();
+
+            document.getElementById('milestoneModal').classList.add('show');
+            document.getElementById('milestoneModalTitle').textContent = '编辑里程碑';
+            document.getElementById('milestoneTitle').value = milestone.title;
+            document.getElementById('milestoneDate').value = milestone.date;
+            document.getElementById('milestoneDesc').value = milestone.desc || milestone.description || '';
+        }
+
+        async function deleteMilestoneFromDetail() {
+            if (!appState.currentEditingMilestone) return;
+
+            if (confirm('确定要删除这个里程碑吗？')) {
+                await deleteMilestone(appState.currentEditingMilestone.id);
+                closeMilestoneDetail();
+            }
         }
 
         // 保存打卡
@@ -1200,12 +1823,24 @@
             }
 
             document.getElementById('inspireContent').value = '';
+            document.getElementById('inspireModalTitle').textContent = '记录灵感';
+            document.getElementById('saveInspireBtn').textContent = '保存灵感';
+            appState.currentEditingInspire = null;
+            document.getElementById('inspireModal').classList.add('show');
+        }
+
+        function openEditInspireModal(inspire) {
+            document.getElementById('inspireContent').value = inspire.content;
+            document.getElementById('inspireModalTitle').textContent = '编辑灵感';
+            document.getElementById('saveInspireBtn').textContent = '更新灵感';
+            appState.currentEditingInspire = inspire;
             document.getElementById('inspireModal').classList.add('show');
         }
 
         // 关闭灵感模态框
         function closeInspireModal() {
             document.getElementById('inspireModal').classList.remove('show');
+            appState.currentEditingInspire = null;
         }
 
         // 保存灵感
@@ -1223,19 +1858,35 @@
             }
 
             try {
-                const { error } = await appState.supabase
-                    .from('inspires')
-                    .insert({
-                        content: content,
-                        created_at: new Date().toISOString()
-                    });
+                if (appState.currentEditingInspire) {
+                    // 编辑模式
+                    const { error } = await appState.supabase
+                        .from('inspires')
+                        .update({
+                            content: content
+                        })
+                        .eq('id', appState.currentEditingInspire.id);
 
-                if (error) throw error;
+                    if (error) throw error;
+
+                    showStatus('✅ 灵感已更新！', 'success');
+                } else {
+                    // 新增模式
+                    const { error } = await appState.supabase
+                        .from('inspires')
+                        .insert({
+                            content: content,
+                            created_at: new Date().toISOString()
+                        });
+
+                    if (error) throw error;
+
+                    showStatus('✅ 灵感已保存！', 'success');
+                }
 
                 await loadInspires();
                 displayDailyInspiration(); // 保存后更新今日灵感显示
                 closeInspireModal();
-                showStatus('✅ 灵感已保存！', 'success');
             } catch (error) {
                 console.error('保存失败:', error);
                 alert('保存失败：' + error.message);
@@ -1535,17 +2186,20 @@
             return html;
         }
 
-        // 渲染日历
+        // 渲染当前月份日历
         function renderCalendar() {
-            const grid = document.getElementById('calendarGrid');
-            let html = '';
+            const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
 
-            // 2月到6月（索引1到5）
-            for (let month = 1; month <= 5; month++) {
-                html += generateMonthCalendar(month);
-            }
+            // 更新标题
+            document.getElementById('calendarTitle').textContent = `${appState.currentYear}年${monthNames[appState.currentMonth]}`;
+            document.getElementById('monthTitle').textContent = monthNames[appState.currentMonth];
 
-            grid.innerHTML = html;
+            // 生成日历HTML
+            const daysGrid = document.getElementById('daysGrid');
+            daysGrid.innerHTML = generateMonthDays(appState.currentYear, appState.currentMonth);
+
+            // 更新导航按钮状态
+            updateNavButtons();
 
             // 添加点击事件
             document.querySelectorAll('.day[data-date]').forEach(dayElement => {
@@ -1555,6 +2209,176 @@
                     openCheckinModal(date);
                 });
             });
+        }
+
+        // 生成单月日历的日期部分
+        function generateMonthDays(year, month) {
+            // 计算该月第一天是周几（以周一为第一周的开始）
+            const firstDay = new Date(year, month, 1);
+            let firstDayOfWeek = firstDay.getDay(); // 0=周日, 1=周一, ..., 6=周六
+            // 转换为：周一=0, 周二=1, ..., 周日=6
+            firstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            let html = '';
+
+            // 星期标题（从周一开始）
+            const weekDays = ['一', '二', '三', '四', '五', '六', '日'];
+            weekDays.forEach(day => {
+                html += `<div class="day" style="font-weight: 600; color: #667eea; cursor: default;">${day}</div>`;
+            });
+
+            // 空白日期
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                html += `<div class="day other-month"></div>`;
+            }
+
+            // 日期
+            const today = new Date();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dateStr = date.toISOString().split('T')[0];
+                const dayOfWeek = date.getDay();
+                const dayOfMonth = date.getDate();
+
+                let className = 'day';
+
+                // 判断日期类型（确保调休和节假日样式优先级正确）
+                const holidayName = getHolidayName(month, dayOfMonth);
+                const isWorkdayAdjust = isWorkdayAdjustment(month, dayOfMonth);
+
+                if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === day) {
+                    className += ' today';
+                } else if (holidayName) {
+                    className += ' holiday';
+                } else if (isWorkdayAdjust) {
+                    className += ' workday-adjust';
+                } else if (dayOfWeek === 0 || dayOfWeek === 6) {
+                    className += ' weekend';
+                }
+
+                // 检查是否有打卡
+                const checkin = appState.checkins.find(c => c.date === dateStr);
+                if (checkin) {
+                    className += ' checked-in';
+                }
+
+                // 获取节假日名称或调休标记
+                let dayTag = '';
+                if (holidayName) {
+                    dayTag = `<span class="day-tag">${holidayName}</span>`;
+                } else if (isWorkdayAdjustment(month, dayOfMonth)) {
+                    dayTag = `<span class="day-tag">班</span>`;
+                }
+
+                // 仅显示分数值，不显示"分"字，不显示emoji
+                const moodScore = checkin ? `<span class="mood-score">${checkin.mood}</span>` : '';
+
+                html += `
+                    <div class="${className}" data-date="${dateStr}">
+                        ${dayTag}
+                        <span class="day-number">${day}</span>
+                        ${moodScore}
+                    </div>
+                `;
+            }
+
+            return html;
+        }
+
+        // 更新导航按钮状态
+        function updateNavButtons() {
+            const prevBtn = document.getElementById('prevMonthBtn');
+            const nextBtn = document.getElementById('nextMonthBtn');
+
+            // 限制只显示2月到6月（索引1到5）
+            prevBtn.disabled = appState.currentMonth <= 1;
+            nextBtn.disabled = appState.currentMonth >= 5;
+        }
+
+        // 上个月
+        function goToPrevMonth() {
+            if (appState.currentMonth > 1) {
+                // 添加滑动动画
+                const slide = document.getElementById('calendarSlide');
+                slide.style.transition = 'transform 0.3s ease-out';
+                slide.style.transform = 'translateX(30px)';
+                slide.style.opacity = '0.3';
+
+                setTimeout(() => {
+                    appState.currentMonth--;
+                    renderCalendar();
+
+                    // 重置动画
+                    slide.style.transition = 'none';
+                    slide.style.transform = 'translateX(-30px)';
+                    slide.style.opacity = '0.3';
+
+                    setTimeout(() => {
+                        slide.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+                        slide.style.transform = 'translateX(0)';
+                        slide.style.opacity = '1';
+                    }, 50);
+                }, 200);
+            }
+        }
+
+        // 下个月
+        function goToNextMonth() {
+            if (appState.currentMonth < 5) {
+                // 添加滑动动画
+                const slide = document.getElementById('calendarSlide');
+                slide.style.transition = 'transform 0.3s ease-out';
+                slide.style.transform = 'translateX(-30px)';
+                slide.style.opacity = '0.3';
+
+                setTimeout(() => {
+                    appState.currentMonth++;
+                    renderCalendar();
+
+                    // 重置动画
+                    slide.style.transition = 'none';
+                    slide.style.transform = 'translateX(30px)';
+                    slide.style.opacity = '0.3';
+
+                    setTimeout(() => {
+                        slide.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+                        slide.style.transform = 'translateX(0)';
+                        slide.style.opacity = '1';
+                    }, 50);
+                }, 200);
+            }
+        }
+
+        // 触摸滑动支持
+        function initTouchEvents() {
+            const container = document.getElementById('calendarContainer');
+
+            container.addEventListener('touchstart', function(e) {
+                appState.touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            container.addEventListener('touchend', function(e) {
+                appState.touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+        }
+
+        // 处理滑动
+        function handleSwipe() {
+            const swipeThreshold = 50; // 滑动阈值
+            const diff = appState.touchStartX - appState.touchEndX;
+
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    // 左滑，下个月
+                    goToNextMonth();
+                } else {
+                    // 右滑，上个月
+                    goToPrevMonth();
+                }
+            }
         }
 
         // 显示配置面板
@@ -1607,6 +2431,18 @@
             document.getElementById('saveInspireBtn').addEventListener('click', saveInspire);
             document.getElementById('refreshInspireBtn').addEventListener('click', refreshDailyInspiration);
 
+            // 里程碑相关事件监听
+            document.getElementById('addMilestoneBtn').addEventListener('click', openMilestoneModal);
+            document.getElementById('closeMilestoneModalBtn').addEventListener('click', closeMilestoneModal);
+            document.getElementById('cancelMilestoneBtn').addEventListener('click', closeMilestoneModal);
+            document.getElementById('saveMilestoneBtn').addEventListener('click', saveMilestone);
+
+            // 里程碑详情相关事件监听
+            document.getElementById('closeMilestoneDetailBtn').addEventListener('click', closeMilestoneDetail);
+            document.getElementById('closeMilestoneDetailBtn2').addEventListener('click', closeMilestoneDetail);
+            document.getElementById('editMilestoneBtn').addEventListener('click', editMilestone);
+            document.getElementById('deleteMilestoneBtn').addEventListener('click', deleteMilestoneFromDetail);
+
             // 点击模态框外部关闭
             document.getElementById('checkinModal').addEventListener('click', function(e) {
                 if (e.target === this) {
@@ -1620,6 +2456,32 @@
                     closeInspireModal();
                 }
             });
+
+            // 点击里程碑模态框外部关闭
+            document.getElementById('milestoneModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeMilestoneModal();
+                }
+            });
+
+            // 点击里程碑详情模态框外部关闭
+            document.getElementById('milestoneDetailModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeMilestoneDetail();
+                }
+            });
+
+            // 绑定日历导航按钮事件
+            document.getElementById('prevMonthBtn').addEventListener('click', goToPrevMonth);
+            document.getElementById('nextMonthBtn').addEventListener('click', goToNextMonth);
+
+            // 初始化触摸滑动事件
+            initTouchEvents();
+
+            // 设置当前月份为今天所在的月份
+            const today = new Date();
+            appState.currentYear = today.getFullYear();
+            appState.currentMonth = today.getMonth();
 
             // 渲染日历
             renderCalendar();
