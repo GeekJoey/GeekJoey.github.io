@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Health 2026 - 个人身体管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        
+        .metric-card {
+            transition: all 0.2s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px -2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- 主容器 -->
+    <div class="max-w-2xl mx-auto px-4 py-6">
+        <!-- 头部 -->
+        <header class="text-center mb-6">
+            <div class="flex items-center justify-center mb-2">
+                <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center mr-3">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">Daily Health 2026</h1>
+            </div>
+            <p class="text-gray-500 text-sm">记录每一天，遇见更好的自己</p>
+        </header>
+
+        <!-- 日期导航 -->
+        <div class="bg-white rounded-2xl card-shadow p-4 mb-6">
+            <div class="flex items-center justify-between">
+                <button onclick="previousDay()" class="p-2 hover:bg-gray-100 rounded-xl transition" id="prevBtn">
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                
+                <div class="text-center" id="dateDisplay">
+                    <p class="text-lg font-semibold text-gray-800" id="currentDateText">加载中...</p>
+                    <p class="text-sm text-gray-500" id="currentWeekday"></p>
+                </div>
+                
+                <button onclick="nextDay()" class="p-2 hover:bg-gray-100 rounded-xl transition" id="nextBtn">
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- 数据展示区域 -->
+        <div id="displaySection" class="mb-6 hidden">
+            <div class="bg-white rounded-2xl card-shadow p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-gray-800">今日记录</h2>
+                    <button onclick="editRecord()" class="text-blue-600 text-sm font-medium hover:text-blue-700 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        编辑
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4" id="metricsDisplay">
+                    <!-- 指标卡片会动态插入这里 -->
+                </div>
+                
+                <button onclick="deleteRecord()" class="mt-6 w-full py-3 border border-red-200 text-red-600 rounded-xl font-medium hover:bg-red-50 transition">
+                    删除今日记录
+                </button>
+            </div>
+        </div>
+
+        <!-- 数据录入表单 -->
+        <div id="formSection" class="mb-6">
+            <div class="bg-white rounded-2xl card-shadow p-6 fade-in">
+                <h2 class="text-lg font-semibold text-gray-800 mb-6" id="formTitle">记录今日数据</h2>
+                
+                <form id="healthForm" class="space-y-5">
+                    <!-- 睡眠时长 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                                </svg>
+                                睡眠时长
+                            </span>
+                        </label>
+                        <input type="number" id="sleepHours" step="0.1" min="0" max="24" placeholder="例如：7.5" 
+                            class="w-full px-4 py-3 border border-gray-200 rounded-xl input-focus focus:outline-none focus:border-blue-500">
+                    </div>
+                    
+                    <!-- 咖啡杯数 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"></path>
+                                </svg>
+                                咖啡杯数
+                            </span>
+                        </label>
+                        <input type="number" id="coffeeCups" min="0" max="20" placeholder="例如：2" 
+                            class="w-full px-4 py-3 border border-gray-200 rounded-xl input-focus focus:outline-none focus:border-blue-500">
+                    </div>
+                    
+                    <!-- 压力值 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                心态压力值 (1-10)
+                            </span>
+                        </label>
+                        <div class="flex items-center space-x-4">
+                            <input type="range" id="stressLevel" min="1" max="10" value="5" 
+                                class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-500"
+                                oninput="updateStressValue(this.value)">
+                            <span id="stressValue" class="text-2xl font-bold text-red-500 w-8 text-center">5</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-400 mt-1">
+                            <span>轻松</span>
+                            <span>压力大</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 工作时长 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                                工作时长
+                            </span>
+                        </label>
+                        <input type="number" id="workHours" step="0.5" min="0" max="24" placeholder="例如：8" 
+                            class="w-full px-4 py-3 border border-gray-200 rounded-xl input-focus focus:outline-none focus:border-blue-500">
+                    </div>
+                    
+                    <!-- 俯卧撑个数 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                                </svg>
+                                俯卧撑个数
+                            </span>
+                        </label>
+                        <input type="number" id="pushups" min="0" placeholder="例如：30" 
+                            class="w-full px-4 py-3 border border-gray-200 rounded-xl input-focus focus:outline-none focus:border-blue-500">
+                    </div>
+                    
+                    <!-- 锻炼时长 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                                锻炼时长（分钟）
+                            </span>
+                        </label>
+                        <input type="number" id="exerciseMinutes" min="0" placeholder="例如：45" 
+                            class="w-full px-4 py-3 border border-gray-200 rounded-xl input-focus focus:outline-none focus:border-blue-500">
+                    </div>
+                    
+                    <!-- 有氧运动 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                                </svg>
+                                有氧运动
+                            </span>
+                        </label>
+                        <div class="flex space-x-3">
+                            <label class="flex-1 flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-teal-500 transition" id="aerobicYes">
+                                <input type="radio" name="aerobic" value="true" class="hidden" onchange="selectAerobic(true)">
+                                <span class="text-gray-600" id="aerobicYesText">是</span>
+                            </label>
+                            <label class="flex-1 flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-teal-500 transition" id="aerobicNo">
+                                <input type="radio" name="aerobic" value="false" class="hidden" onchange="selectAerobic(false)">
+                                <span class="text-gray-600" id="aerobicNoText">否</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- 提交按钮 -->
+                    <button type="submit" class="w-full gradient-bg text-white py-4 rounded-xl font-semibold text-lg hover:opacity-90 transition mt-6">
+                        保存记录
+                    </button>
+                    
+                    <button type="button" onclick="cancelEdit()" id="cancelBtn" class="w-full py-3 border border-gray-200 text-gray-600 rounded-xl font-medium hover:bg-gray-50 transition hidden">
+                        取消编辑
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 状态信息 -->
+        <div class="text-center text-sm text-gray-400" id="statusInfo">
+            <p>数据存储模式：<span id="storageMode">未配置</span></p>
+        </div>
+        
+        <!-- 重新配置按钮 -->
+        <div class="text-center mt-4">
+            <button onclick="resetConfig()" class="text-sm text-blue-600 hover:text-blue-700">
+                重新配置数据库
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 预设 Supabase 配置
+        const DEFAULT_SUPABASE_URL = 'https://bbmdviffgxarxuptfftp.supabase.co';
+        const DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJibWR2aWZmZ3hhcnh1cHRmZnRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MzgyNzEsImV4cCI6MjA4NTUxNDI3MX0.qqceYnTa7ZtD-Sl1JbNFs1l_0JStdTzrrIXiXv62k54';
+        
+        // 配置和状态变量
+        let supabaseClient = null;
+        let useSupabase = false;
+        let currentDate = null;
+        let currentDateStr = '';
+        let isEditing = false;
+        
+        // 初始化日期范围：2026年2月7日至6月30日
+        const startDate = new Date('2026-02-07');
+        const endDate = new Date('2026-06-30');
+        
+        // 页面加载完成后初始化
+        window.onload = function() {
+            console.log('页面开始加载...');
+            initApp();
+        };
+        
+        // 初始化应用
+        function initApp() {
+            // 设置当前日期
+            currentDate = new Date();
+            currentDateStr = formatDate(currentDate);
+            
+            console.log('当前日期:', currentDate);
+            console.log('格式化日期:', currentDateStr);
+            
+            // 更新日期显示
+            updateDateDisplay();
+            
+            // 连接 Supabase
+            connectToSupabase();
+            
+            // 加载数据
+            setTimeout(() => {
+                loadData();
+            }, 200);
+        }
+        
+        // 连接 Supabase
+        function connectToSupabase() {
+            try {
+                const { createClient } = window.supabase;
+                supabaseClient = createClient(DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_KEY);
+                useSupabase = true;
+                
+                document.getElementById('storageMode').textContent = 'Supabase 云端';
+                document.getElementById('storageMode').className = 'text-blue-600 font-medium';
+                
+                console.log('Supabase 连接成功');
+            } catch (error) {
+                console.error('Supabase 连接失败:', error);
+                useSupabase = false;
+                document.getElementById('storageMode').textContent = '连接失败';
+                document.getElementById('storageMode').className = 'text-red-500';
+            }
+        }
+        
+        // 更新日期显示
+        function updateDateDisplay() {
+            currentDateStr = formatDate(currentDate);
+            
+            const dateTextEl = document.getElementById('currentDateText');
+            const weekdayEl = document.getElementById('currentWeekday');
+            
+            if (dateTextEl) {
+                dateTextEl.textContent = formatDateCN(currentDate);
+            }
+            if (weekdayEl) {
+                weekdayEl.textContent = getWeekday(currentDate);
+            }
+            
+            // 更新按钮状态
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            if (prevBtn) {
+                prevBtn.disabled = currentDate <= startDate;
+                prevBtn.style.opacity = currentDate <= startDate ? '0.5' : '1';
+            }
+            if (nextBtn) {
+                nextBtn.disabled = currentDate >= endDate;
+                nextBtn.style.opacity = currentDate >= endDate ? '0.5' : '1';
+            }
+            
+            console.log('日期显示已更新:', currentDateStr);
+        }
+        
+        // 日期导航
+        function previousDay() {
+            if (currentDate > startDate) {
+                currentDate.setDate(currentDate.getDate() - 1);
+                updateDateDisplay();
+                loadData();
+            }
+        }
+        
+        function nextDay() {
+            if (currentDate < endDate) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                updateDateDisplay();
+                loadData();
+            }
+        }
+        
+        // 格式化日期
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        function formatDateCN(date) {
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            return `${year}年${month}月${day}日`;
+        }
+        
+        function getWeekday(date) {
+            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            return weekdays[date.getDay()];
+        }
+        
+        // 压力值更新
+        function updateStressValue(value) {
+            const stressValueEl = document.getElementById('stressValue');
+            if (stressValueEl) {
+                stressValueEl.textContent = value;
+                const colors = ['#10B981', '#34D399', '#6EE7B7', '#FBBF24', '#F59E0B', '#F97316', '#EF4444', '#DC2626', '#B91C1C', '#991B1B'];
+                stressValueEl.style.color = colors[value - 1];
+            }
+        }
+        
+        // 有氧运动选择
+        function selectAerobic(value) {
+            const yesBtn = document.getElementById('aerobicYes');
+            const noBtn = document.getElementById('aerobicNo');
+            const yesText = document.getElementById('aerobicYesText');
+            const noText = document.getElementById('aerobicNoText');
+            
+            if (value) {
+                yesBtn.classList.add('border-teal-500', 'bg-teal-50');
+                yesBtn.classList.remove('border-gray-200');
+                yesText.classList.add('text-teal-600', 'font-semibold');
+                
+                noBtn.classList.remove('border-teal-500', 'bg-teal-50');
+                noBtn.classList.add('border-gray-200');
+                noText.classList.remove('text-teal-600', 'font-semibold');
+            } else {
+                noBtn.classList.add('border-teal-500', 'bg-teal-50');
+                noBtn.classList.remove('border-gray-200');
+                noText.classList.add('text-teal-600', 'font-semibold');
+                
+                yesBtn.classList.remove('border-teal-500', 'bg-teal-50');
+                yesBtn.classList.add('border-gray-200');
+                yesText.classList.remove('text-teal-600', 'font-semibold');
+            }
+        }
+        
+        // 表单提交
+        document.getElementById('healthForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                date: currentDateStr,
+                sleep_hours: parseFloat(document.getElementById('sleepHours').value) || null,
+                coffee_cups: parseInt(document.getElementById('coffeeCups').value) || null,
+                stress_level: parseInt(document.getElementById('stressLevel').value) || null,
+                work_hours: parseFloat(document.getElementById('workHours').value) || null,
+                pushups: parseInt(document.getElementById('pushups').value) || null,
+                exercise_minutes: parseInt(document.getElementById('exerciseMinutes').value) || null,
+                aerobic: document.querySelector('input[name="aerobic"]:checked')?.value === 'true'
+            };
+            
+            try {
+                if (useSupabase) {
+                    await saveToSupabase(data);
+                } else {
+                    saveToLocal(data);
+                }
+                
+                resetForm();
+                loadData();
+                
+                alert('保存成功！');
+            } catch (error) {
+                console.error('保存失败:', error);
+                alert('保存失败，请稍后重试');
+            }
+        });
+        
+        // 保存到 Supabase
+        async function saveToSupabase(data) {
+            // 检查是否已存在记录
+            const { data: existing, error: checkError } = await supabaseClient
+                .from('daily_records')
+                .select('id')
+                .eq('date', data.date)
+                .single();
+            
+            if (existing) {
+                // 更新现有记录
+                const { error } = await supabaseClient
+                    .from('daily_records')
+                    .update({
+                        sleep_hours: data.sleep_hours,
+                        coffee_cups: data.coffee_cups,
+                        stress_level: data.stress_level,
+                        work_hours: data.work_hours,
+                        pushups: data.pushups,
+                        exercise_minutes: data.exercise_minutes,
+                        aerobic: data.aerobic,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('date', data.date);
+                
+                if (error) throw error;
+            } else {
+                // 插入新记录
+                const { error } = await supabaseClient
+                    .from('daily_records')
+                    .insert([data]);
+                
+                if (error) throw error;
+            }
+        }
+        
+        // 保存到本地
+        function saveToLocal(data) {
+            let records = JSON.parse(localStorage.getItem('dailyHealth2026_records') || '{}');
+            records[data.date] = {
+                ...data,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+            localStorage.setItem('dailyHealth2026_records', JSON.stringify(records));
+        }
+        
+        // 加载数据
+        async function loadData() {
+            let data = null;
+            
+            if (useSupabase) {
+                data = await loadFromSupabase();
+            } else {
+                data = loadFromLocal();
+            }
+            
+            console.log('加载到的数据:', data);
+            
+            if (data) {
+                displayData(data);
+            } else {
+                showForm();
+            }
+        }
+        
+        // 从 Supabase 加载
+        async function loadFromSupabase() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('daily_records')
+                    .select('*')
+                    .eq('date', currentDateStr)
+                    .single();
+                
+                if (error && error.code !== 'PGRST116') {
+                    console.error('从 Supabase 加载失败:', error);
+                    return null;
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('从 Supabase 加载异常:', error);
+                return null;
+            }
+        }
+        
+        // 从本地加载
+        function loadFromLocal() {
+            const records = JSON.parse(localStorage.getItem('dailyHealth2026_records') || '{}');
+            return records[currentDateStr] || null;
+        }
+        
+        // 显示数据
+        function displayData(data) {
+            const formSection = document.getElementById('formSection');
+            const displaySection = document.getElementById('displaySection');
+            
+            if (formSection) formSection.classList.add('hidden');
+            if (displaySection) {
+                displaySection.classList.remove('hidden');
+                displaySection.classList.add('fade-in');
+            }
+            
+            const metrics = [
+                { key: 'sleep_hours', label: '睡眠时长', unit: '小时', icon: '🌙', color: 'indigo' },
+                { key: 'coffee_cups', label: '咖啡杯数', unit: '杯', icon: '☕', color: 'amber' },
+                { key: 'stress_level', label: '压力值', unit: '分', icon: '😰', color: 'red' },
+                { key: 'work_hours', label: '工作时长', unit: '小时', icon: '💼', color: 'blue' },
+                { key: 'pushups', label: '俯卧撑', unit: '个', icon: '💪', color: 'green' },
+                { key: 'exercise_minutes', label: '锻炼时长', unit: '分钟', icon: '🏃', color: 'purple' },
+                { key: 'aerobic', label: '有氧运动', unit: '', icon: '✨', color: 'teal', isBoolean: true }
+            ];
+            
+            const displayContainer = document.getElementById('metricsDisplay');
+            if (displayContainer) {
+                displayContainer.innerHTML = '';
+                
+                metrics.forEach(metric => {
+                    const value = data[metric.key];
+                    if (value !== null && value !== undefined && value !== '') {
+                        const displayValue = metric.isBoolean ? (value ? '是' : '否') : value;
+                        const card = document.createElement('div');
+                        card.className = `metric-card bg-${metric.color}-50 rounded-xl p-4`;
+                        card.innerHTML = `
+                            <div class="flex items-center mb-2">
+                                <span class="text-2xl mr-2">${metric.icon}</span>
+                                <span class="text-sm text-gray-600">${metric.label}</span>
+                            </div>
+                            <div class="text-2xl font-bold text-${metric.color}-600">${displayValue}${metric.unit ? ' ' + metric.unit : ''}</div>
+                        `;
+                        displayContainer.appendChild(card);
+                    }
+                });
+                
+                if (displayContainer.children.length === 0) {
+                    displayContainer.innerHTML = '<p class="col-span-2 text-center text-gray-400 py-8">暂无记录数据</p>';
+                }
+            }
+        }
+        
+        // 显示表单
+        function showForm() {
+            const formSection = document.getElementById('formSection');
+            const displaySection = document.getElementById('displaySection');
+            const formTitle = document.getElementById('formTitle');
+            const cancelBtn = document.getElementById('cancelBtn');
+            
+            if (displaySection) displaySection.classList.add('hidden');
+            if (formSection) {
+                formSection.classList.remove('hidden');
+                formSection.classList.add('fade-in');
+            }
+            if (formTitle) formTitle.textContent = `记录 ${formatDateCN(currentDate)} 数据`;
+            isEditing = false;
+            if (cancelBtn) cancelBtn.classList.add('hidden');
+        }
+        
+        // 编辑记录
+        async function editRecord() {
+            let data = null;
+            if (useSupabase) {
+                data = await loadFromSupabase();
+            } else {
+                data = loadFromLocal();
+            }
+            
+            if (!data) return;
+            
+            // 填充表单
+            document.getElementById('sleepHours').value = data.sleep_hours || '';
+            document.getElementById('coffeeCups').value = data.coffee_cups || '';
+            document.getElementById('stressLevel').value = data.stress_level || 5;
+            updateStressValue(data.stress_level || 5);
+            document.getElementById('workHours').value = data.work_hours || '';
+            document.getElementById('pushups').value = data.pushups || '';
+            document.getElementById('exerciseMinutes').value = data.exercise_minutes || '';
+            
+            if (data.aerobic !== null && data.aerobic !== undefined) {
+                selectAerobic(data.aerobic);
+                const yesRadio = document.querySelector('input[name="aerobic"][value="true"]');
+                const noRadio = document.querySelector('input[name="aerobic"][value="false"]');
+                if (data.aerobic) {
+                    yesRadio.checked = true;
+                } else {
+                    noRadio.checked = true;
+                }
+            }
+            
+            // 显示表单
+            const formSection = document.getElementById('formSection');
+            const displaySection = document.getElementById('displaySection');
+            const formTitle = document.getElementById('formTitle');
+            const cancelBtn = document.getElementById('cancelBtn');
+            
+            if (displaySection) displaySection.classList.add('hidden');
+            if (formSection) {
+                formSection.classList.remove('hidden');
+                formSection.classList.add('fade-in');
+            }
+            if (formTitle) formTitle.textContent = `编辑 ${formatDateCN(currentDate)} 数据`;
+            isEditing = true;
+            if (cancelBtn) cancelBtn.classList.remove('hidden');
+        }
+        
+        // 取消编辑
+        function cancelEdit() {
+            resetForm();
+            loadData();
+        }
+        
+        // 删除记录
+        async function deleteRecord() {
+            if (!confirm('确定要删除这条记录吗？')) return;
+            
+            try {
+                if (useSupabase) {
+                    const { error } = await supabaseClient
+                        .from('daily_records')
+                        .delete()
+                        .eq('date', currentDateStr);
+                    
+                    if (error) throw error;
+                } else {
+                    let records = JSON.parse(localStorage.getItem('dailyHealth2026_records') || '{}');
+                    delete records[currentDateStr];
+                    localStorage.setItem('dailyHealth2026_records', JSON.stringify(records));
+                }
+                
+                loadData();
+                alert('删除成功！');
+            } catch (error) {
+                console.error('删除失败:', error);
+                alert('删除失败，请稍后重试');
+            }
+        }
+        
+        // 重置表单
+        function resetForm() {
+            document.getElementById('healthForm').reset();
+            document.getElementById('stressLevel').value = 5;
+            updateStressValue(5);
+            
+            // 重置有氧运动选择
+            const yesBtn = document.getElementById('aerobicYes');
+            const noBtn = document.getElementById('aerobicNo');
+            const yesText = document.getElementById('aerobicYesText');
+            const noText = document.getElementById('aerobicNoText');
+            
+            yesBtn.classList.remove('border-teal-500', 'bg-teal-50');
+            noBtn.classList.remove('border-teal-500', 'bg-teal-50');
+            yesText.classList.remove('text-teal-600', 'font-semibold');
+            noText.classList.remove('text-teal-600', 'font-semibold');
+            
+            const radios = document.querySelectorAll('input[name="aerobic"]');
+            radios.forEach(radio => radio.checked = false);
+        }
+        
+        // 重置配置
+        function resetConfig() {
+            if (confirm('确定要重新配置数据库吗？')) {
+                localStorage.removeItem('dailyHealth2026_url');
+                localStorage.removeItem('dailyHealth2026_key');
+                localStorage.removeItem('dailyHealth2026_storage');
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
