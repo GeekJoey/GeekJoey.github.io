@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 Free Yourself</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .status-bar {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .status-message {
+            flex: 1;
+        }
+
+        .status-message.loading {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .status-message.success {
+            color: #155724;
+            background: #d4edda;
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+
+        .status-message.error {
+            color: #721c24;
+            background: #f8d7da;
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+
+        .config-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .config-section.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .config-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #555;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-save-config {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+            color: white;
+        }
+
+        .btn-save-config:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 54, 93, 0.4);
+        }
+
+        .btn-settings {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            padding: 0;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(26, 54, 93, 0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-settings:hover {
+            transform: rotate(90deg);
+            box-shadow: 0 6px 16px rgba(26, 54, 93, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .btn-settings {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1em;
+                top: 15px;
+                right: 15px;
+            }
+        }
+
+        /* 被启发模块样式 */
+        .inspire-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .inspire-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            transform: rotate(30deg);
+            pointer-events: none;
+        }
+
+        .inspire-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .inspire-section h3 {
+            color: white;
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .btn-add-inspire {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            width: 38px;
+            height: 38px;
+            font-size: 24px;
+            line-height: 38px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-add-inspire:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(1.1);
+        }
+
+        .inspire-tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .inspire-tag {
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .inspire-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            background: white;
+        }
+
+        .inspire-tag .delete-btn {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .inspire-tag:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .inspire-tag .delete-btn:hover {
+            color: #e74c3c;
+        }
+
+        /* 里程碑模块样式 */
+        .milestone-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(240, 147, 251, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .milestone-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            transform: rotate(30deg);
+            pointer-events: none;
+        }
+
+        .milestone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .milestone-section h3 {
+            color: white;
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .btn-add-milestone {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            width: 38px;
+            height: 38px;
+            font-size: 24px;
+            line-height: 38px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-add-milestone:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(1.1);
+        }
+
+        .milestone-tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .milestone-tag {
+            background: rgba(255, 255, 255, 0.9);
+            color: #f5576c;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .milestone-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            background: white;
+        }
+
+        .milestone-tag .delete-btn {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .milestone-tag:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .milestone-tag .delete-btn:hover {
+            color: #e74c3c;
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 日历样式 */
+        .calendar-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-title {
+            font-size: 1.3em;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calendar-nav button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s;
+        }
+
+        .calendar-nav button:hover {
+            transform: scale(1.1);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            color: #667eea;
+            padding: 10px 0;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            background: #f8f9fa;
+        }
+
+        .calendar-day:hover {
+            background: #e9ecef;
+        }
+
+        .calendar-day.today {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+        }
+
+        .calendar-day.has-checkin {
+            background: #d4edda;
+            border: 2px solid #28a745;
+        }
+
+        .calendar-day.today.has-checkin {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .calendar-day .day-number {
+            font-size: 1.1em;
+            margin-bottom: 2px;
+        }
+
+        .calendar-day .checkin-count {
+            font-size: 0.75em;
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .calendar-day.today .checkin-count {
+            color: white;
+        }
+
+        /* 右侧面板 */
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 倒计时样式 */
+        .countdown-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .countdown-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .countdown-item {
+            text-align: center;
+        }
+
+        .countdown-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #f5576c;
+        }
+
+        .countdown-label {
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        /* 统计样式 */
+        .stats-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .stats-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #666;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            color: #f5576c;
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        /* 感悟详情模态框 */
+        .reflection-detail {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .reflection-detail .date {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .reflection-detail .content {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* 里程碑详情模态框 */
+        .milestone-detail {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .milestone-detail .title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #f5576c;
+            margin-bottom: 10px;
+        }
+
+        .milestone-detail .date {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .milestone-detail .desc {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* 空状态提示 */
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .status-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .countdown-timer {
+                gap: 10px;
+            }
+
+            .countdown-value {
+                font-size: 1.5em;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>2026 Free Yourself</h1>
+        </div>
+
+        <!-- 设置按钮 -->
+        <button class="btn-settings" id="settingsBtn" title="设置">⚙</button>
+
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <div class="status-message" id="statusMessage">
+                准备就绪
+            </div>
+        </div>
+
+        <!-- Supabase 配置区域 -->
+        <div class="config-section" id="configSection">
+            <h3>Supabase 配置</h3>
+            <div class="form-group">
+                <label for="supabaseUrl">Supabase URL</label>
+                <input type="text" id="supabaseUrl" placeholder="https://your-project.supabase.co">
+            </div>
+            <div class="form-group">
+                <label for="supabaseKey">Anon Key</label>
+                <input type="text" id="supabaseKey" placeholder="your-anon-key">
+            </div>
+            <button class="btn btn-save-config" id="saveConfigBtn">保存配置</button>
+        </div>
+
+        <!-- 被启发模块 -->
+        <div class="inspire-section">
+            <div class="inspire-header">
+                <h3>被启发</h3>
+                <button class="btn-add-inspire" id="addInspireBtn" title="添加启发">+</button>
+            </div>
+            <div class="inspire-tags-container" id="inspireTagsContainer">
+                <!-- 动态加载启发标签 -->
+            </div>
+        </div>
+
+        <!-- 里程碑模块 -->
+        <div class="milestone-section">
+            <div class="milestone-header">
+                <h3>里程碑</h3>
+                <button class="btn-add-milestone" id="addMilestoneBtn" title="添加里程碑">+</button>
+            </div>
+            <div class="milestone-tags-container" id="milestoneTagsContainer">
+                <!-- 动态加载里程碑标签 -->
+            </div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 日历 -->
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <h3 class="calendar-title" id="calendarTitle">2026年1月</h3>
+                    <div class="calendar-nav">
+                        <button id="prevMonthBtn">&lt;</button>
+                        <button id="nextMonthBtn">&gt;</button>
+                    </div>
+                </div>
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- 动态加载日历 -->
+                </div>
+            </div>
+
+            <!-- 右侧面板 -->
+            <div class="side-panel">
+                <!-- 倒计时 -->
+                <div class="countdown-section">
+                    <h3>距离 2027 年还有</h3>
+                    <div class="countdown-timer" id="countdownTimer">
+                        <div class="countdown-item">
+                            <div class="countdown-value" id="daysValue">0</div>
+                            <div class="countdown-label">天</div>
+                        </div>
+                        <div class="countdown-item">
+                            <div class="countdown-value" id="hoursValue">0</div>
+                            <div class="countdown-label">时</div>
+                        </div>
+                        <div class="countdown-item">
+                            <div class="countdown-value" id="minutesValue">0</div>
+                            <div class="countdown-label">分</div>
+                        </div>
+                        <div class="countdown-item">
+                            <div class="countdown-value" id="secondsValue">0</div>
+                            <div class="countdown-label">秒</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 统计 -->
+                <div class="stats-section">
+                    <h3>统计数据</h3>
+                    <div class="stat-item">
+                        <span class="stat-label">打卡天数</span>
+                        <span class="stat-value" id="totalCheckins">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">连续打卡</span>
+                        <span class="stat-value" id="streakDays">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">启发记录</span>
+                        <span class="stat-value" id="totalInpires">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">里程碑</span>
+                        <span class="stat-value" id="totalMilestones">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 打卡模态框 -->
+    <div class="modal" id="checkinModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="checkinModalTitle">打卡</h2>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="checkinDate">日期</label>
+                <input type="date" id="checkinDate">
+            </div>
+            <div class="form-group">
+                <label for="checkinContent">感悟</label>
+                <textarea id="checkinContent" placeholder="记录今天的感悟..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancelCheckinBtn">取消</button>
+                <button class="btn btn-primary" id="saveCheckinBtn">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 被启发模态框 -->
+    <div class="modal" id="inspireModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="inspireModalTitle">添加启发</h2>
+                <button class="close-btn" id="closeInspireModalBtn">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="inspireContent">启发内容</label>
+                <textarea id="inspireContent" placeholder="记录启发你的内容..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancelInspireBtn">取消</button>
+                <button class="btn btn-primary" id="saveInspireBtn">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 里程碑模态框 -->
+    <div class="modal" id="milestoneModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="milestoneModalTitle">添加里程碑</h2>
+                <button class="close-btn" id="closeMilestoneModalBtn">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="milestoneTitle">标题 <span style="color: #f5576c;">*</span></label>
+                <input type="text" id="milestoneTitle" placeholder="里程碑标题">
+            </div>
+            <div class="form-group">
+                <label for="milestoneDesc">描述</label>
+                <textarea id="milestoneDesc" placeholder="里程碑描述（可选）..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="milestoneDate">日期</label>
+                <input type="date" id="milestoneDate">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancelMilestoneBtn">取消</button>
+                <button class="btn btn-primary" id="saveMilestoneBtn">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 里程碑详情模态框 -->
+    <div class="modal" id="milestoneDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>里程碑详情</h2>
+                <button class="close-btn" id="closeMilestoneDetailBtn">&times;</button>
+            </div>
+            <div class="milestone-detail">
+                <div class="title" id="milestoneDetailTitle"></div>
+                <div class="date" id="milestoneDetailDate"></div>
+                <div class="desc" id="milestoneDetailDesc"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="closeMilestoneDetailBtn2">关闭</button>
+                <button class="btn btn-secondary" id="editMilestoneBtn" style="background: #ffc107; color: #333;">编辑</button>
+                <button class="btn btn-primary" id="deleteMilestoneBtn" style="background: #dc3545;">删除</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // 应用状态
+            const appState = {
+                supabase: null,
+                currentYear: 2026,
+                currentMonth: 0,
+                checkins: [],
+                inspires: [],
+                milestones: [],
+                editingMilestoneId: null
+            };
+
+            // 显示状态消息
+            function showStatus(message, type = 'loading') {
+                const statusEl = document.getElementById('statusMessage');
+                statusEl.textContent = message;
+                statusEl.className = 'status-message ' + type;
+            }
+
+            // 获取 Supabase 配置
+            function getSupabaseConfig() {
+                return {
+                    url: localStorage.getItem('supabase_url') || '',
+                    key: localStorage.getItem('supabase_key') || ''
+                };
+            }
+
+            // 保存 Supabase 配置
+            function saveSupabaseConfig(url, key) {
+                localStorage.setItem('supabase_url', url);
+                localStorage.setItem('supabase_key', key);
+            }
+
+            // 连接 Supabase
+            async function connectSupabase(url, key) {
+                try {
+                    showStatus('正在连接数据库...', 'loading');
+                    appState.supabase = supabase.createClient(url, key);
+
+                    // 测试连接
+                    const { data, error } = await appState.supabase.from('checkins').select('count').limit(1);
+
+                    if (error && error.code !== 'PGRST116') {
+                        throw error;
+                    }
+
+                    showStatus('数据库连接成功', 'success');
+                    await loadData();
+                } catch (error) {
+                    console.error('连接失败:', error);
+                    showStatus('数据库连接失败: ' + error.message, 'error');
+                    appState.supabase = null;
+                }
+            }
+
+            // 加载所有数据
+            async function loadData() {
+                if (!appState.supabase) return;
+
+                try {
+                    // 并行加载所有数据
+                    const [checkinsResult, inspiresResult, milestonesResult] = await Promise.all([
+                        appState.supabase.from('checkins').select('*').order('date', { ascending: false }),
+                        appState.supabase.from('inspires').select('*').order('created_at', { ascending: false }),
+                        appState.supabase.from('milestones').select('*').order('created_at', { ascending: false })
+                    ]);
+
+                    if (checkinsResult.data) {
+                        appState.checkins = checkinsResult.data;
+                    }
+
+                    if (inspiresResult.data) {
+                        appState.inspires = inspiresResult.data;
+                    }
+
+                    if (milestonesResult.data) {
+                        appState.milestones = milestonesResult.data;
+                    }
+
+                    renderAll();
+                    updateStats();
+                } catch (error) {
+                    console.error('加载数据失败:', error);
+                    showStatus('加载数据失败', 'error');
+                }
+            }
+
+            // 渲染所有内容
+            function renderAll() {
+                renderInspireTags();
+                renderMilestoneTags();
+                renderCalendar();
+            }
+
+            // 渲染启发标签
+            function renderInspireTags() {
+                const container = document.getElementById('inspireTagsContainer');
+
+                if (appState.inspires.length === 0) {
+                    container.innerHTML = '<div class="empty-state">暂无启发记录，点击右上角 + 添加</div>';
+                    return;
+                }
+
+                container.innerHTML = appState.inspires.map(inspire => `
+                    <div class="inspire-tag" onclick="window.showInspireDetail('${inspire.id}')">
+                        ${escapeHtml(inspire.content)}
+                        <span class="delete-btn" onclick="event.stopPropagation(); window.deleteInspire('${inspire.id}')">&times;</span>
+                    </div>
+                `).join('');
+            }
+
+            // 渲染里程碑标签 - 修改为按字数排序
+            function renderMilestoneTags() {
+                const container = document.getElementById('milestoneTagsContainer');
+
+                if (appState.milestones.length === 0) {
+                    container.innerHTML = '<div class="empty-state">暂无里程碑记录，点击右上角 + 添加</div>';
+                    return;
+                }
+
+                // 按字数由少到多排序
+                const sortedMilestones = [...appState.milestones].sort((a, b) => {
+                    const lenA = (a.title || '').length + (a.desc || '').length;
+                    const lenB = (b.title || '').length + (b.desc || '').length;
+                    return lenA - lenB;
+                });
+
+                container.innerHTML = sortedMilestones.map(milestone => `
+                    <div class="milestone-tag" onclick="window.showMilestoneDetail('${milestone.id}')">
+                        ${escapeHtml(milestone.title)}
+                        <span class="delete-btn" onclick="event.stopPropagation(); window.deleteMilestone('${milestone.id}')">&times;</span>
+                    </div>
+                `).join('');
+            }
+
+            // 渲染日历
+            function renderCalendar() {
+                const grid = document.getElementById('calendarGrid');
+                const title = document.getElementById('calendarTitle');
+
+                const year = appState.currentYear;
+                const month = appState.currentMonth;
+
+                title.textContent = `${year}年${month + 1}月`;
+
+                // 获取该月的第一天和最后一天
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const daysInMonth = lastDay.getDate();
+                const startDayOfWeek = firstDay.getDay();
+
+                // 生成日历头部
+                const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+                let html = dayNames.map(day => `<div class="calendar-day-header">${day}</div>`).join('');
+
+                // 填充空白日期
+                for (let i = 0; i < startDayOfWeek; i++) {
+                    html += '<div class="calendar-day"></div>';
+                }
+
+                // 填充日期
+                const today = new Date();
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    const checkinsOnDay = appState.checkins.filter(c => c.date === dateStr);
+                    const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
+
+                    html += `
+                        <div class="calendar-day ${isToday ? 'today' : ''} ${checkinsOnDay.length > 0 ? 'has-checkin' : ''}"
+                             onclick="window.openCheckinModal('${dateStr}')">
+                            <div class="day-number">${day}</div>
+                            ${checkinsOnDay.length > 0 ? `<div class="checkin-count">${checkinsOnDay.length}条</div>` : ''}
+                        </div>
+                    `;
+                }
+
+                grid.innerHTML = html;
+            }
+
+            // 更新统计数据
+            function updateStats() {
+                document.getElementById('totalCheckins').textContent = appState.checkins.length;
+                document.getElementById('totalInpires').textContent = appState.inspires.length;
+                document.getElementById('totalMilestones').textContent = appState.milestones.length;
+
+                // 计算连续打卡天数
+                const streak = calculateStreak();
+                document.getElementById('streakDays').textContent = streak;
+            }
+
+            // 计算连续打卡天数
+            function calculateStreak() {
+                if (appState.checkins.length === 0) return 0;
+
+                const dates = [...new Set(appState.checkins.map(c => c.date))].sort().reverse();
+                const today = new Date().toISOString().split('T')[0];
+
+                let streak = 0;
+                let currentDate = new Date(today);
+
+                for (const date of dates) {
+                    const dateStr = currentDate.toISOString().split('T')[0];
+                    if (dates.includes(dateStr)) {
+                        streak++;
+                        currentDate.setDate(currentDate.getDate() - 1);
+                    } else {
+                        break;
+                    }
+                }
+
+                return streak;
+            }
+
+            // 更新倒计时
+            function updateCountdown() {
+                const now = new Date();
+                const endOfYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
+                const diff = endOfYear - now;
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('daysValue').textContent = days;
+                document.getElementById('hoursValue').textContent = hours;
+                document.getElementById('minutesValue').textContent = minutes;
+                document.getElementById('secondsValue').textContent = seconds;
+            }
+
+            // HTML 转义
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // 打开打卡模态框
+            window.openCheckinModal = function(date) {
+                document.getElementById('checkinDate').value = date;
+                document.getElementById('checkinContent').value = '';
+                document.getElementById('checkinModalTitle').textContent = '打卡';
+                document.getElementById('checkinModal').classList.add('show');
+            };
+
+            // 关闭打卡模态框
+            function closeCheckinModal() {
+                document.getElementById('checkinModal').classList.remove('show');
+            }
+
+            // 保存打卡
+            async function saveCheckin() {
+                if (!appState.supabase) {
+                    showStatus('请先连接数据库', 'error');
+                    return;
+                }
+
+                const date = document.getElementById('checkinDate').value;
+                const content = document.getElementById('checkinContent').value.trim();
+
+                if (!date) {
+                    showStatus('请选择日期', 'error');
+                    return;
+                }
+
+                if (!content) {
+                    showStatus('请填写感悟', 'error');
+                    return;
+                }
+
+                try {
+                    const { data, error } = await appState.supabase
+                        .from('checkins')
+                        .insert([{ date, content }]);
+
+                    if (error) throw error;
+
+                    showStatus('打卡成功', 'success');
+                    closeCheckinModal();
+                    await loadData();
+                } catch (error) {
+                    console.error('保存失败:', error);
+                    showStatus('保存失败: ' + error.message, 'error');
+                }
+            }
+
+            // 打开启发模态框
+            function openInspireModal() {
+                document.getElementById('inspireContent').value = '';
+                document.getElementById('inspireModalTitle').textContent = '添加启发';
+                document.getElementById('inspireModal').classList.add('show');
+            }
+
+            // 关闭启发模态框
+            function closeInspireModal() {
+                document.getElementById('inspireModal').classList.remove('show');
+            }
+
+            // 保存启发
+            async function saveInspire() {
+                if (!appState.supabase) {
+                    showStatus('请先连接数据库', 'error');
+                    return;
+                }
+
+                const content = document.getElementById('inspireContent').value.trim();
+
+                if (!content) {
+                    showStatus('请填写启发内容', 'error');
+                    return;
+                }
+
+                try {
+                    const { data, error } = await appState.supabase
+                        .from('inspires')
+                        .insert([{ content }]);
+
+                    if (error) throw error;
+
+                    showStatus('添加成功', 'success');
+                    closeInspireModal();
+                    await loadData();
+                } catch (error) {
+                    console.error('保存失败:', error);
+                    showStatus('保存失败: ' + error.message, 'error');
+                }
+            }
+
+            // 删除启发
+            window.deleteInspire = async function(id) {
+                if (!appState.supabase) return;
+
+                if (!confirm('确定要删除这条启发吗？')) return;
+
+                try {
+                    const { error } = await appState.supabase
+                        .from('inspires')
+                        .delete()
+                        .eq('id', id);
+
+                    if (error) throw error;
+
+                    showStatus('删除成功', 'success');
+                    await loadData();
+                } catch (error) {
+                    console.error('删除失败:', error);
+                    showStatus('删除失败: ' + error.message, 'error');
+                }
+            };
+
+            // 打开里程碑模态框
+            function openMilestoneModal() {
+                document.getElementById('milestoneTitle').value = '';
+                document.getElementById('milestoneDesc').value = '';
+                document.getElementById('milestoneDate').value = '';
+                document.getElementById('milestoneModalTitle').textContent = '添加里程碑';
+                appState.editingMilestoneId = null;
+                document.getElementById('milestoneModal').classList.add('show');
+            }
+
+            // 关闭里程碑模态框
+            function closeMilestoneModal() {
+                document.getElementById('milestoneModal').classList.remove('show');
+            }
+
+            // 保存里程碑 - 修改为非必填字段
+            async function saveMilestone() {
+                if (!appState.supabase) {
+                    showStatus('请先连接数据库', 'error');
+                    return;
+                }
+
+                const title = document.getElementById('milestoneTitle').value.trim();
+                const desc = document.getElementById('milestoneDesc').value.trim();
+                const date = document.getElementById('milestoneDate').value;
+
+                // 只要求标题必填
+                if (!title) {
+                    showStatus('请填写里程碑标题', 'error');
+                    return;
+                }
+
+                try {
+                    if (appState.editingMilestoneId) {
+                        // 更新
+                        const { error } = await appState.supabase
+                            .from('milestones')
+                            .update({ title, desc, date: date || null })
+                            .eq('id', appState.editingMilestoneId);
+
+                        if (error) throw error;
+                        showStatus('更新成功', 'success');
+                    } else {
+                        // 新增
+                        const { error } = await appState.supabase
+                            .from('milestones')
+                            .insert([{ title, desc, date: date || null }]);
+
+                        if (error) throw error;
+                        showStatus('添加成功', 'success');
+                    }
+
+                    closeMilestoneModal();
+                    await loadData();
+                } catch (error) {
+                    console.error('保存失败:', error);
+                    showStatus('保存失败: ' + error.message, 'error');
+                }
+            }
+
+            // 显示里程碑详情 - 修改为不显示日期标签
+            window.showMilestoneDetail = function(id) {
+                const milestone = appState.milestones.find(m => m.id === id);
+                if (!milestone) return;
+
+                document.getElementById('milestoneDetailTitle').textContent = milestone.title;
+                // 只在详情页面显示日期
+                document.getElementById('milestoneDetailDate').textContent = milestone.date ? `日期: ${milestone.date}` : '暂无日期';
+                document.getElementById('milestoneDetailDesc').textContent = milestone.desc || '暂无描述';
+
+                appState.editingMilestoneId = id;
+                document.getElementById('milestoneDetailModal').classList.add('show');
+            };
+
+            // 关闭里程碑详情
+            function closeMilestoneDetail() {
+                document.getElementById('milestoneDetailModal').classList.remove('show');
+                appState.editingMilestoneId = null;
+            }
+
+            // 编辑里程碑
+            function editMilestone() {
+                const milestone = appState.milestones.find(m => m.id === appState.editingMilestoneId);
+                if (!milestone) return;
+
+                document.getElementById('milestoneTitle').value = milestone.title;
+                document.getElementById('milestoneDesc').value = milestone.desc || '';
+                document.getElementById('milestoneDate').value = milestone.date || '';
+                document.getElementById('milestoneModalTitle').textContent = '编辑里程碑';
+
+                closeMilestoneDetail();
+                document.getElementById('milestoneModal').classList.add('show');
+            }
+
+            // 删除里程碑
+            async function deleteMilestoneFromDetail() {
+                if (!appState.supabase || !appState.editingMilestoneId) return;
+
+                if (!confirm('确定要删除这个里程碑吗？')) return;
+
+                try {
+                    const { error } = await appState.supabase
+                        .from('milestones')
+                        .delete()
+                        .eq('id', appState.editingMilestoneId);
+
+                    if (error) throw error;
+
+                    showStatus('删除成功', 'success');
+                    closeMilestoneDetail();
+                    await loadData();
+                } catch (error) {
+                    console.error('删除失败:', error);
+                    showStatus('删除失败: ' + error.message, 'error');
+                }
+            }
+
+            // 删除里程碑（从标签）
+            window.deleteMilestone = async function(id) {
+                if (!appState.supabase) return;
+
+                if (!confirm('确定要删除这个里程碑吗？')) return;
+
+                try {
+                    const { error } = await appState.supabase
+                        .from('milestones')
+                        .delete()
+                        .eq('id', id);
+
+                    if (error) throw error;
+
+                    showStatus('删除成功', 'success');
+                    await loadData();
+                } catch (error) {
+                    console.error('删除失败:', error);
+                    showStatus('删除失败: ' + error.message, 'error');
+                }
+            };
+
+            // 切换配置区域显示
+            function toggleConfigSection() {
+                const section = document.getElementById('configSection');
+                section.classList.toggle('show');
+
+                if (section.classList.contains('show')) {
+                    const config = getSupabaseConfig();
+                    document.getElementById('supabaseUrl').value = config.url;
+                    document.getElementById('supabaseKey').value = config.key;
+                }
+            }
+
+            // 保存配置
+            async function saveConfig() {
+                const url = document.getElementById('supabaseUrl').value.trim();
+                const key = document.getElementById('supabaseKey').value.trim();
+
+                if (!url || !key) {
+                    showStatus('请填写完整的配置信息', 'error');
+                    return;
+                }
+
+                saveSupabaseConfig(url, key);
+                await connectSupabase(url, key);
+                toggleConfigSection();
+            }
+
+            // 日历导航
+            function goToPrevMonth() {
+                appState.currentMonth--;
+                if (appState.currentMonth < 0) {
+                    appState.currentMonth = 11;
+                    appState.currentYear--;
+                }
+                renderCalendar();
+            }
+
+            function goToNextMonth() {
+                appState.currentMonth++;
+                if (appState.currentMonth > 11) {
+                    appState.currentMonth = 0;
+                    appState.currentYear++;
+                }
+                renderCalendar();
+            }
+
+            // 触摸滑动支持
+            function initTouchEvents() {
+                let startX = 0;
+                const calendar = document.getElementById('calendarGrid');
+
+                calendar.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                });
+
+                calendar.addEventListener('touchend', (e) => {
+                    const endX = e.changedTouches[0].clientX;
+                    const diff = startX - endX;
+
+                    if (Math.abs(diff) > 50) {
+                        if (diff > 0) {
+                            goToNextMonth();
+                        } else {
+                            goToPrevMonth();
+                        }
+                    }
+                });
+            }
+
+            // 初始化
+            document.addEventListener('DOMContentLoaded', function() {
+                // 绑定事件
+                document.getElementById('settingsBtn').addEventListener('click', toggleConfigSection);
+                document.getElementById('saveConfigBtn').addEventListener('click', saveConfig);
+                document.getElementById('closeModalBtn').addEventListener('click', closeCheckinModal);
+                document.getElementById('cancelCheckinBtn').addEventListener('click', closeCheckinModal);
+                document.getElementById('saveCheckinBtn').addEventListener('click', saveCheckin);
+                document.getElementById('addInspireBtn').addEventListener('click', openInspireModal);
+                document.getElementById('closeInspireModalBtn').addEventListener('click', closeInspireModal);
+                document.getElementById('cancelInspireBtn').addEventListener('click', closeInspireModal);
+                document.getElementById('saveInspireBtn').addEventListener('click', saveInspire);
+                document.getElementById('addMilestoneBtn').addEventListener('click', openMilestoneModal);
+                document.getElementById('closeMilestoneModalBtn').addEventListener('click', closeMilestoneModal);
+                document.getElementById('cancelMilestoneBtn').addEventListener('click', closeMilestoneModal);
+                document.getElementById('saveMilestoneBtn').addEventListener('click', saveMilestone);
+
+                // 里程碑详情相关事件监听
+                document.getElementById('closeMilestoneDetailBtn').addEventListener('click', closeMilestoneDetail);
+                document.getElementById('closeMilestoneDetailBtn2').addEventListener('click', closeMilestoneDetail);
+                document.getElementById('editMilestoneBtn').addEventListener('click', editMilestone);
+                document.getElementById('deleteMilestoneBtn').addEventListener('click', deleteMilestoneFromDetail);
+
+                // 点击模态框外部关闭
+                document.getElementById('checkinModal').addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal();
+                    }
+                });
+
+                // 点击被启发模态框外部关闭
+                document.getElementById('inspireModal').addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeInspireModal();
+                    }
+                });
+
+                // 点击里程碑模态框外部关闭
+                document.getElementById('milestoneModal').addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeMilestoneModal();
+                    }
+                });
+
+                // 点击里程碑详情模态框外部关闭
+                document.getElementById('milestoneDetailModal').addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeMilestoneDetail();
+                    }
+                });
+
+                // 绑定日历导航按钮事件
+                document.getElementById('prevMonthBtn').addEventListener('click', goToPrevMonth);
+                document.getElementById('nextMonthBtn').addEventListener('click', goToNextMonth);
+
+                // 初始化触摸滑动事件
+                initTouchEvents();
+
+                // 设置当前月份为今天所在的月份
+                const today = new Date();
+                appState.currentYear = today.getFullYear();
+                appState.currentMonth = today.getMonth();
+
+                // 渲染日历
+                renderCalendar();
+
+                // 更新倒计时
+                updateCountdown();
+
+                // 自动连接 Supabase
+                const config = getSupabaseConfig();
+                if (config.url && config.key && config.url !== 'https://your-project.supabase.co') {
+                    connectSupabase(config.url, config.key);
+                } else {
+                    showStatus('请点击"设置 Supabase"配置连接信息', 'error');
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
