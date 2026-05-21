@@ -608,6 +608,21 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
+        /* Last day (6月26日) 金色背景 */
+        .day.last-day {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            color: #7c3f00;
+            font-weight: 800;
+            transform: scale(1.1);
+            box-shadow: 0 4px 16px rgba(253, 160, 133, 0.5);
+            border: 2px solid #f6d365;
+        }
+
+        .day.last-day .day-number {
+            font-size: 1.8em;
+            line-height: 1;
+        }
+
         .day.checked-in {
             background: linear-gradient(135deg, #a8ff78 0%, #78ffd6 100%);
             font-weight: 600;
@@ -1228,11 +1243,10 @@
         <div class="tab-content" id="calendarTab">
             <!-- 倒计时 -->
         <div class="countdown-box">
-            <div class="countdown-title">距离 6月22日 还有</div>
+            <div class="countdown-title">距离 6月26日 还有</div>
             <div class="countdown-days" id="countdown">-</div>
-            <div class="countdown-label">个工作日（非周末+节假日）</div>
+            <div class="countdown-label">个工作日（去除周末/节假日/年假）</div>
             <div class="countdown-extra" id="countdownExtra">剩余周数：-</div>
-            <div class="annual-leave" id="annualLeave">还有6天年假未请</div>
             <div style="margin-top: 10px;">
                 <span class="current-date">今天：<span id="currentDate"></span></span>
             </div>
@@ -1444,17 +1458,24 @@
                 workDaysBefore: [],
                 workDaysAfter: []
             },
-            '个人年假1': {
+            '个人年假-5月25日': {
                 name: '年假',
-                start: { month: 3, day: 3 },  // 4月3日
-                end: { month: 3, day: 3 },    // 4月3日
+                start: { month: 4, day: 25 },  // 5月25日
+                end: { month: 4, day: 25 },    // 5月25日
                 workDaysBefore: [],
                 workDaysAfter: []
             },
-            '个人年假2': {
+            '个人年假-6月15-18日': {
                 name: '年假',
-                start: { month: 3, day: 7 },  // 4月7日
-                end: { month: 3, day: 7 },    // 4月7日
+                start: { month: 5, day: 15 },  // 6月15日
+                end: { month: 5, day: 18 },    // 6月18日
+                workDaysBefore: [],
+                workDaysAfter: []
+            },
+            '个人年假-6月22-23日': {
+                name: '年假',
+                start: { month: 5, day: 22 },  // 6月22日
+                end: { month: 5, day: 23 },    // 6月23日
                 workDaysBefore: [],
                 workDaysAfter: []
             },
@@ -2198,13 +2219,13 @@
         // 计算工作日倒计时
         function calculateWorkdays() {
             const today = new Date();
-            const targetDate = new Date(2026, 5, 22); // 6月22日
+            const targetDate = new Date(2026, 5, 26); // 6月26日
 
             if (today > targetDate) return { workdays: 0, weeks: 0 };
 
             let workdays = 0;
             let current = new Date(today);
-            current.setDate(current.getDate() + 1); // 从明天开始计算
+            // 从今天开始计算（含当天）
 
             while (current < targetDate) {
                 if (isWorkday(current)) {
@@ -2220,49 +2241,11 @@
             return { workdays, weeks };
         }
 
-        // 计算年假使用情况
-        function calculateAnnualLeave() {
-            const totalAnnualLeave = 6; // 总年假天数
-            let usedAnnualLeave = 0;
-            const today = new Date();
-            
-            // 检查个人年假配置
-            const personalLeaves = ['个人年假1', '个人年假2'];
-            
-            for (const leaveKey of personalLeaves) {
-                if (holidays2026[leaveKey]) {
-                    const leave = holidays2026[leaveKey];
-                    const leaveDate = new Date(2026, leave.start.month, leave.start.day);
-                    
-                    // 如果个人年假日期已经过去，计入已使用年假
-                    if (leaveDate <= today) {
-                        usedAnnualLeave++;
-                    }
-                }
-            }
-            
-            const remainingAnnualLeave = totalAnnualLeave - usedAnnualLeave;
-            return { used: usedAnnualLeave, remaining: remainingAnnualLeave, total: totalAnnualLeave };
-        }
-
         // 更新倒计时
         function updateCountdown() {
             const { workdays, weeks } = calculateWorkdays();
             document.getElementById('countdown').textContent = workdays;
             document.getElementById('countdownExtra').textContent = `剩余周数：${weeks}周`;
-
-            // 更新年假信息
-            const { used, remaining, total } = calculateAnnualLeave();
-            const annualLeaveElement = document.getElementById('annualLeave');
-            if (annualLeaveElement) {
-                if (remaining > 0) {
-                    annualLeaveElement.textContent = `还有${remaining}天年假未请（已使用${used}/${total}天）`;
-                    annualLeaveElement.style.color = '#ff6b6b';
-                } else {
-                    annualLeaveElement.textContent = `年假已全部使用完毕（${used}/${total}天）`;
-                    annualLeaveElement.style.color = '#51cf66';
-                }
-            }
 
             const today = new Date();
             const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
@@ -2352,6 +2335,8 @@
 
                 if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === day) {
                     className += ' today';
+                } else if (year === 2026 && month === 5 && day === 26) {
+                    className += ' last-day';
                 } else if (holidayName) {
                     className += ' holiday';
                 } else if (isWorkdayAdjust) {
@@ -2368,7 +2353,9 @@
 
                 // 获取节假日名称或调休标记
                 let dayTag = '';
-                if (holidayName) {
+                if (year === 2026 && month === 5 && day === 26) {
+                    dayTag = `<span class="day-tag" style="color:#b8860b !important; font-size:0.6em;">🏁</span>`;
+                } else if (holidayName) {
                     dayTag = `<span class="day-tag">${holidayName}</span>`;
                 } else if (isWorkdayAdjustment(month, dayOfMonth)) {
                     dayTag = `<span class="day-tag">班</span>`;
@@ -2380,7 +2367,7 @@
                 html += `
                     <div class="${className}" data-date="${dateStr}">
                         ${dayTag}
-                        <span class="day-number">${day}</span>
+                        <span class="day-number">${year === 2026 && month === 5 && day === 26 ? '🏆' : day}</span>
                         ${moodScore}
                     </div>
                 `;
@@ -2458,6 +2445,8 @@
 
                 if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === day) {
                     className += ' today';
+                } else if (year === 2026 && month === 5 && day === 26) {
+                    className += ' last-day';
                 } else if (holidayName) {
                     className += ' holiday';
                 } else if (isWorkdayAdjust) {
@@ -2474,7 +2463,9 @@
 
                 // 获取节假日名称或调休标记
                 let dayTag = '';
-                if (holidayName) {
+                if (year === 2026 && month === 5 && day === 26) {
+                    dayTag = `<span class="day-tag" style="color:#b8860b !important; font-size:0.6em;">🏁</span>`;
+                } else if (holidayName) {
                     dayTag = `<span class="day-tag">${holidayName}</span>`;
                 } else if (isWorkdayAdjustment(month, dayOfMonth)) {
                     dayTag = `<span class="day-tag">班</span>`;
@@ -2486,7 +2477,7 @@
                 html += `
                     <div class="${className}" data-date="${dateStr}">
                         ${dayTag}
-                        <span class="day-number">${day}</span>
+                        <span class="day-number">${year === 2026 && month === 5 && day === 26 ? '🏆' : day}</span>
                         ${moodScore}
                     </div>
                 `;
